@@ -146,15 +146,19 @@ void SP_turret_driver (edict_t *self);
 
 
 spawn_t	spawns[] = {
+	/*
 	{"item_health", SP_item_health},
 	{"item_health_small", SP_item_health_small},
 	{"item_health_large", SP_item_health_large},
 	{"item_health_mega", SP_item_health_mega},
+	*/
 
 	{"info_player_start", SP_info_player_start},
+	/*
 	{"info_player_deathmatch", SP_info_player_deathmatch},
 	{"info_player_coop", SP_info_player_coop},
 	{"info_player_intermission", SP_info_player_intermission},
+	*/
 
 	{"func_plat", SP_func_plat},
 	{"func_button", SP_func_button},
@@ -216,6 +220,7 @@ spawn_t	spawns[] = {
 	{"path_corner", SP_path_corner},
 	{"point_combat", SP_point_combat},
 
+	/*
 	{"misc_explobox", SP_misc_explobox},
 	{"misc_banner", SP_misc_banner},
 	{"misc_satellite_dish", SP_misc_satellite_dish},
@@ -264,6 +269,7 @@ spawn_t	spawns[] = {
 	{"turret_breach", SP_turret_breach},
 	{"turret_base", SP_turret_base},
 	{"turret_driver", SP_turret_driver},
+	*/
 
 	{NULL, NULL}
 };
