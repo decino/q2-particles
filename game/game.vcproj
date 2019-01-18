@@ -1988,6 +1988,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\p_menu.c"
+				>
+			</File>
+			<File
 				RelativePath="p_trail.c"
 				>
 				<FileConfiguration
@@ -2230,6 +2234,10 @@
 			</File>
 			<File
 				RelativePath="m_tank.h"
+				>
+			</File>
+			<File
+				RelativePath=".\p_menu.h"
 				>
 			</File>
 			<File

@@ -71,6 +71,19 @@ void SelectNextItem (edict_t *ent, int itflags)
 
 	cl = ent->client;
 
+	//ZOID
+	if (cl->menu) 
+	{
+		PMenu_Next(ent);
+		return;
+	}
+	else if (cl->chase_target) 
+	{
+		ChaseNext(ent);
+		return;
+	}
+	//ZOID
+
 	if (cl->chase_target) {
 		ChaseNext(ent);
 		return;
@@ -102,6 +115,19 @@ void SelectPrevItem (edict_t *ent, int itflags)
 	gitem_t		*it;
 
 	cl = ent->client;
+
+	//ZOID
+	if (cl->menu) 
+	{
+		PMenu_Prev(ent);
+		return;
+	} 
+	else if (cl->chase_target) 
+	{
+		ChasePrev(ent);
+		return;
+	}
+	//ZOID
 
 	if (cl->chase_target) {
 		ChasePrev(ent);
@@ -481,12 +507,20 @@ void Cmd_Inven_f (edict_t *ent)
 	cl->showscores = false;
 	cl->showhelp = false;
 
+	//ZOID
+	if (ent->client->menu) 
+	{
+		PMenu_Close(ent);
+		ent->client->update_chase = true;
+		return;
+	}
+	//ZOID
+
 	if (cl->showinventory)
 	{
 		cl->showinventory = false;
 		return;
 	}
-
 	cl->showinventory = true;
 
 	gi.WriteByte (svc_inventory);

@@ -27,6 +27,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define	GAME_INCLUDE
 #include "game.h"
 
+//ZOID
+#include "p_menu.h"
+//ZOID
+
 // the "gameversion" client command will print this plus compile date
 #define	GAMEVERSION	"baseq2"
 
@@ -890,6 +894,12 @@ struct gclient_s
 	pmove_state_t		old_pmove;	// for detecting out-of-pmove changes
 
 	qboolean	showscores;			// set layout stat
+
+	//ZOID
+	qboolean	inmenu;				// in menu
+	pmenuhnd_t	*menu;				// current menu
+	//ZOID
+
 	qboolean	showinventory;		// set layout stat
 	qboolean	showhelp;
 	qboolean	showhelpicon;
@@ -960,6 +970,11 @@ struct gclient_s
 
 	edict_t		*chase_target;		// player we are chasing
 	qboolean	update_chase;		// need to update chase info?
+
+	//ZOID
+	float		menutime;			// time to update menu
+	qboolean	menudirty;
+	//ZOID
 };
 
 
