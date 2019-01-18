@@ -151,6 +151,7 @@ Give items to a client
 */
 void Cmd_Give_f (edict_t *ent)
 {
+	/*
 	char		*name;
 	gitem_t		*it;
 	int			index;
@@ -293,6 +294,7 @@ void Cmd_Give_f (edict_t *ent)
 		if (it_ent->inuse)
 			G_FreeEdict(it_ent);
 	}
+	*/
 }
 
 

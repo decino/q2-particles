@@ -1060,6 +1060,7 @@ be on an entity that hasn't spawned yet.
 */
 void SpawnItem (edict_t *ent, gitem_t *item)
 {
+	/*
 	PrecacheItem (item);
 
 	if (ent->spawnflags)
@@ -1127,6 +1128,7 @@ void SpawnItem (edict_t *ent, gitem_t *item)
 	ent->s.renderfx = RF_GLOW;
 	if (ent->model)
 		gi.modelindex (ent->model);
+	*/
 }
 
 //======================================================================
