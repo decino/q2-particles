@@ -309,6 +309,7 @@ argv(0) god
 */
 void Cmd_God_f (edict_t *ent)
 {
+	/*
 	char	*msg;
 
 	if (deathmatch->value && !sv_cheats->value)
@@ -324,6 +325,7 @@ void Cmd_God_f (edict_t *ent)
 		msg = "godmode ON\n";
 
 	gi.cprintf (ent, PRINT_HIGH, msg);
+	*/
 }
 
 
@@ -338,6 +340,7 @@ argv(0) notarget
 */
 void Cmd_Notarget_f (edict_t *ent)
 {
+	/*
 	char	*msg;
 
 	if (deathmatch->value && !sv_cheats->value)
@@ -353,6 +356,7 @@ void Cmd_Notarget_f (edict_t *ent)
 		msg = "notarget ON\n";
 
 	gi.cprintf (ent, PRINT_HIGH, msg);
+	*/
 }
 
 
@@ -365,6 +369,7 @@ argv(0) noclip
 */
 void Cmd_Noclip_f (edict_t *ent)
 {
+	/*
 	char	*msg;
 
 	if (deathmatch->value && !sv_cheats->value)
@@ -385,6 +390,7 @@ void Cmd_Noclip_f (edict_t *ent)
 	}
 
 	gi.cprintf (ent, PRINT_HIGH, msg);
+	*/
 }
 
 

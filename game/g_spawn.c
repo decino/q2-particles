@@ -201,7 +201,9 @@ spawn_t	spawns[] = {
 	{"target_crosslevel_trigger", SP_target_crosslevel_trigger},
 	{"target_crosslevel_target", SP_target_crosslevel_target},
 	{"target_laser", SP_target_laser},
+	/*
 	{"target_help", SP_target_help},
+	*/
 	{"target_actor", SP_target_actor},
 	{"target_lightramp", SP_target_lightramp},
 	{"target_earthquake", SP_target_earthquake},
@@ -655,6 +657,7 @@ char *single_statusbar =
 "yb	-24 "
 
 // health
+/*
 "xv	0 "
 "hnum "
 "xv	50 "
@@ -707,12 +710,14 @@ char *single_statusbar =
 "	xv	148 "
 "	pic	11 "
 "endif "
+*/
 ;
 
 char *dm_statusbar =
 "yb	-24 "
 
 // health
+/*
 "xv	0 "
 "hnum "
 "xv	50 "
@@ -786,6 +791,7 @@ char *dm_statusbar =
   "xv 64 "
   "stat_string 16 "
 "endif "
+*/
 ;
 
 
