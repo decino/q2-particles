@@ -728,6 +728,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\g_particles.c"
+				>
+			</File>
+			<File
 				RelativePath="g_phys.c"
 				>
 				<FileConfiguration
@@ -2142,6 +2146,10 @@
 			>
 			<File
 				RelativePath="g_local.h"
+				>
+			</File>
+			<File
+				RelativePath=".\g_particles.h"
 				>
 			</File>
 			<File

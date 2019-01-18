@@ -511,11 +511,13 @@ void Cmd_Inven_f (edict_t *ent)
 	if (ent->client->menu) 
 	{
 		PMenu_Close(ent);
-		ent->client->update_chase = true;
 		return;
 	}
 	//ZOID
 
+	pfxMainMenu(ent);
+
+	/*
 	if (cl->showinventory)
 	{
 		cl->showinventory = false;
@@ -529,6 +531,7 @@ void Cmd_Inven_f (edict_t *ent)
 		gi.WriteShort (cl->pers.inventory[i]);
 	}
 	gi.unicast (ent, true);
+	*/
 }
 
 /*
@@ -971,6 +974,7 @@ void ClientCommand (edict_t *ent)
 		Cmd_Say_f (ent, true, false);
 		return;
 	}
+	/*
 	if (Q_stricmp (cmd, "score") == 0)
 	{
 		Cmd_Score_f (ent);
@@ -981,12 +985,13 @@ void ClientCommand (edict_t *ent)
 		Cmd_Help_f (ent);
 		return;
 	}
-
+	*/
 	if (level.intermissiontime)
 		return;
 
 	if (Q_stricmp (cmd, "use") == 0)
 		Cmd_Use_f (ent);
+	/*
 	else if (Q_stricmp (cmd, "drop") == 0)
 		Cmd_Drop_f (ent);
 	else if (Q_stricmp (cmd, "give") == 0)
@@ -997,6 +1002,7 @@ void ClientCommand (edict_t *ent)
 		Cmd_Notarget_f (ent);
 	else if (Q_stricmp (cmd, "noclip") == 0)
 		Cmd_Noclip_f (ent);
+	*/
 	else if (Q_stricmp (cmd, "inven") == 0)
 		Cmd_Inven_f (ent);
 	else if (Q_stricmp (cmd, "invnext") == 0)
@@ -1013,6 +1019,7 @@ void ClientCommand (edict_t *ent)
 		SelectPrevItem (ent, IT_POWERUP);
 	else if (Q_stricmp (cmd, "invuse") == 0)
 		Cmd_InvUse_f (ent);
+	/*
 	else if (Q_stricmp (cmd, "invdrop") == 0)
 		Cmd_InvDrop_f (ent);
 	else if (Q_stricmp (cmd, "weapprev") == 0)
@@ -1029,6 +1036,7 @@ void ClientCommand (edict_t *ent)
 		Cmd_Wave_f (ent);
 	else if (Q_stricmp(cmd, "playerlist") == 0)
 		Cmd_PlayerList_f(ent);
+	*/
 	else	// anything that doesn't match a command will be a chat
 		Cmd_Say_f (ent, false, true);
 }

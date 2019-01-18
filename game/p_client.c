@@ -1761,6 +1761,16 @@ void ClientThink (edict_t *ent, usercmd_t *ucmd)
 		if (other->inuse && other->client->chase_target == ent)
 			UpdateChaseCam(other);
 	}
+
+	//ZOID
+	if (client->menudirty && client->menutime <= level.time) 
+	{
+		PMenu_Do_Update(ent);
+		gi.unicast (ent, true);
+		client->menutime = level.time;
+		client->menudirty = false;
+	}
+	//ZOID
 }
 
 

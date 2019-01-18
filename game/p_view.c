@@ -1080,7 +1080,16 @@ void ClientEndServerFrame (edict_t *ent)
 	// if the scoreboard is up, update it
 	if (ent->client->showscores && !(level.framenum & 31) )
 	{
-		DeathmatchScoreboardMessage (ent, ent->enemy);
+		//ZOID
+		if (ent->client->menu) 
+		{
+			PMenu_Do_Update(ent);
+			ent->client->menudirty = false;
+			ent->client->menutime = level.time;
+		} 
+		else
+		//ZOID
+			DeathmatchScoreboardMessage (ent, ent->enemy);
 		gi.unicast (ent, false);
 	}
 }
