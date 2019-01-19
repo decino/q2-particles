@@ -22,22 +22,12 @@ void pfxEditEntityEffect(edict_t *ent, pmenuhnd_t *p)
 	if (p->cur == 4)
 	{
 		ent->pfx_frequency = 1 + ent->pfx_frequency % 10;
-		gi.dprintf("Frequency: %d Hz\n", ent->pfx_frequency);
 	}
 	if (p->cur == 7)
 	{
 		ent->pfx_projectile_speed = (ent->pfx_projectile_speed + 100) % 2100;
-		gi.dprintf("Projectile speed: %d\n", ent->pfx_projectile_speed);
 	}
-	/*
-	if (p->cur == 10)
-	{
-		ent->pfx_hide_emitter = !ent->pfx_hide_emitter;
-
-		ent->pfx_emitter->s.renderfx ^= RF_WEAPONMODEL;
-		gi.dprintf("Hidden emitter: %d\n", ent->pfx_hide_emitter);
-	}
-	*/
+	updateEntityEffectsMenu(ent, p);
 }
 
 void pfxEntityEffectsMenu(edict_t *ent, pmenuhnd_t *p)
@@ -58,10 +48,10 @@ pmenu_t entity_fx_settings[] =
 	{ "*Entity Effect Settings",	PMENU_ALIGN_LEFT,	NULL },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 	{ "*Frequency (Hz)",			PMENU_ALIGN_LEFT,	NULL },
-	{ "10",							PMENU_ALIGN_LEFT,	pfxEditEntityEffect },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 	{ "*Projectile Speed",			PMENU_ALIGN_LEFT,	NULL },
-	{ "1000",						PMENU_ALIGN_LEFT,	pfxEditEntityEffect },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
@@ -74,6 +64,19 @@ pmenu_t entity_fx_settings[] =
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 };
 
+void updateEntityEffectsMenu(edict_t *ent, pmenuhnd_t *p)
+{
+	static char frequency[8];
+	static char speed[8];
+
+	sprintf(frequency, "%d", ent->pfx_frequency);
+	sprintf(speed, "%d", ent->pfx_projectile_speed);
+
+	PMenu_UpdateEntry(p->entries + 4, frequency, PMENU_ALIGN_LEFT, pfxEditEntityEffect);
+	PMenu_UpdateEntry(p->entries + 7, speed, PMENU_ALIGN_LEFT, pfxEditEntityEffect);
+	PMenu_Update(ent);
+}
+
 void pfxSelectEntitySettings(edict_t *ent, pmenuhnd_t *p)
 {
 	ent->pfx_selected_fx = p->cur + (ent->last_menu * 10);
@@ -82,6 +85,8 @@ void pfxSelectEntitySettings(edict_t *ent, pmenuhnd_t *p)
 
 	PMenu_Close(ent);
 	PMenu_Open(ent, entity_fx_settings, -1, sizeof(entity_fx_settings) / sizeof(pmenu_t), NULL);
+
+	updateEntityEffectsMenu(ent, p);
 }
 
 pmenu_t entity_fx_menu_02[] = 
@@ -191,7 +196,7 @@ void pfxMainMenu(edict_t* ent)
 	switch (ent->last_menu)
 	{
 		case PAGE_MAIN:				PMenu_Open(ent, main_menu, -1, sizeof(main_menu) / sizeof(pmenu_t), NULL); break;
-		case PAGE_ENTITY_SETTINGS:	PMenu_Open(ent, entity_fx_settings, -1, sizeof(entity_fx_settings) / sizeof(pmenu_t), NULL); break;
+		case PAGE_ENTITY_SETTINGS:	PMenu_Open(ent, entity_fx_settings, -1, sizeof(entity_fx_settings) / sizeof(pmenu_t), NULL); pfxSelectEntitySettings(ent, ent->client->menu); break;
 		case PAGE_ENTITY_01:		PMenu_Open(ent, entity_fx_menu_01, -1, sizeof(entity_fx_menu_01) / sizeof(pmenu_t), NULL); break;
 		case PAGE_ENTITY_02:		PMenu_Open(ent, entity_fx_menu_02, -1, sizeof(entity_fx_menu_02) / sizeof(pmenu_t), NULL); break;
 	}

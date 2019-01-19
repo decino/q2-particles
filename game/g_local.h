@@ -1140,6 +1140,5 @@ struct edict_s
 
 	int			last_menu;
 	int			prev_menu;
-	int			cursor_history[0x10];
 };
 

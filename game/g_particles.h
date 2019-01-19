@@ -26,6 +26,7 @@
 #define	PAGE_ENTITY_01			0x0000
 #define	PAGE_ENTITY_02			0x0001
 
+void updateEntityEffectsMenu(edict_t *ent, pmenuhnd_t *p);
 void pfxEditEntityEffect(edict_t *ent, pmenuhnd_t *p);
 void pfxEntityEffectsMenu02(edict_t *ent, pmenuhnd_t *p);
 void pfxEntityEffectsMenu01(edict_t *ent, pmenuhnd_t *p);
