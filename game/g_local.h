@@ -1129,5 +1129,15 @@ struct edict_s
 	monsterinfo_t	monsterinfo;
 
 	char		*musictrack;	// Knightmare- for specifying OGG or CD track
+
+	// Particle mod stuff goes here.
+	edict_t*	pfx_emitter;
+	int			pfx_selected_fx;
+
+	int			pfx_frequency;
+	int			pfx_projectile_speed;
+	qboolean	pfx_hide_emitter;
+
+	int			last_menu;
 };
 

@@ -515,6 +515,7 @@ void Cmd_Inven_f (edict_t *ent)
 	}
 	//ZOID
 
+	// TODO: Remember last menu screen.
 	pfxMainMenu(ent);
 
 	/*
@@ -542,6 +543,14 @@ Cmd_InvUse_f
 void Cmd_InvUse_f (edict_t *ent)
 {
 	gitem_t		*it;
+
+	//ZOID
+	if (ent->client->menu) 
+	{
+		PMenu_Select(ent);
+		return;
+	}
+	//ZOID
 
 	ValidateSelectedItem (ent);
 

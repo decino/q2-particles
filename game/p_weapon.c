@@ -846,6 +846,7 @@ void Blaster_Fire (edict_t *ent, vec3_t g_offset, int damage, qboolean hyper, in
 
 void Weapon_Blaster_Fire (edict_t *ent)
 {
+	/*
 	int		damage;
 
 	if (deathmatch->value)
@@ -853,6 +854,9 @@ void Weapon_Blaster_Fire (edict_t *ent)
 	else
 		damage = 10;
 	Blaster_Fire (ent, vec3_origin, damage, false, EF_BLASTER);
+	*/
+
+	pfxSpawnEmitter(ent, vec3_origin);
 	ent->client->ps.gunframe++;
 }
 

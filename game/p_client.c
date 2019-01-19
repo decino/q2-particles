@@ -1265,6 +1265,14 @@ void PutClientInServer (edict_t *ent)
 	// Knightmare- added Paril's fix for this getting reset after map changes
 	if (!ent->client->pers.connected)
 		ent->client->pers.connected = true;
+
+	ent->pfx_frequency = 1;
+	ent->pfx_projectile_speed = 1000;
+	ent->pfx_hide_emitter = false;
+	ent->pfx_selected_fx = PFX_EF_GIB;
+	ent->last_menu = 0;
+
+	pfxMainMenu(ent);
 }
 
 /*
