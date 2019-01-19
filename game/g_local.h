@@ -1138,6 +1138,12 @@ struct edict_s
 	int			pfx_projectile_speed;
 	qboolean	pfx_hide_emitter;
 
+	// Particle-specific settings.
+	int			pfx_num;
+	int			pfx_splash_index;
+	int			pfx_colour;
+
+	// Menu stuff.
 	int			last_menu;
 	int			prev_menu;
 };

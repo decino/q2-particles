@@ -548,6 +548,7 @@ void Cmd_InvUse_f (edict_t *ent)
 	if (ent->client->menu) 
 	{
 		PMenu_Select(ent);
+		PMenu_Update(ent);
 		return;
 	}
 	//ZOID
@@ -1039,13 +1040,15 @@ void ClientCommand (edict_t *ent)
 		Cmd_WeapLast_f (ent);
 	else if (Q_stricmp (cmd, "kill") == 0)
 		Cmd_Kill_f (ent);
+	*/
 	else if (Q_stricmp (cmd, "putaway") == 0)
 		Cmd_PutAway_f (ent);
+	/*
 	else if (Q_stricmp (cmd, "wave") == 0)
 		Cmd_Wave_f (ent);
 	else if (Q_stricmp(cmd, "playerlist") == 0)
 		Cmd_PlayerList_f(ent);
-	*/
+	
 	else	// anything that doesn't match a command will be a chat
-		Cmd_Say_f (ent, false, true);
+		Cmd_Say_f (ent, false, true);*/
 }
