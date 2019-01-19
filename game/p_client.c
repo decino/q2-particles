@@ -1270,7 +1270,8 @@ void PutClientInServer (edict_t *ent)
 	ent->pfx_projectile_speed = 1000;
 	ent->pfx_hide_emitter = false;
 	ent->pfx_selected_fx = PFX_EF_GIB;
-	ent->last_menu = 0;
+	ent->last_menu = PAGE_MAIN;
+	ent->prev_menu = PAGE_MAIN;
 
 	pfxMainMenu(ent);
 }

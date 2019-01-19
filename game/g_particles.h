@@ -1,19 +1,34 @@
-#define PFX_EF_GIB				0x0003
-#define PFX_EF_BLASTER			0x0004
-#define	PFX_EF_GRENADE			0x0005
-#define	PFX_EF_ROCKET			0x0006
-#define PFX_EF_BFG				0x0007
-#define	PFX_EF_FLIES			0x0008
-#define	PFX_EF_TELEPORTER		0x0009
-#define	PFX_EF_FLAG1			0x000A
-#define PFX_EF_FLAG2			0x000B
-#define PFX_UNDEF_QUAD			0x000C
+#define PFX_EF_GIB				3
+#define PFX_EF_BLASTER			4
+#define	PFX_EF_GRENADE			5
+#define	PFX_EF_ROCKET			6
+#define PFX_EF_BFG				7
+#define	PFX_EF_FLIES			8
+#define	PFX_EF_TELEPORTER		9
+#define	PFX_EF_FLAG1			10
+#define PFX_EF_FLAG2			11
+#define PFX_UNDEF_QUAD			12
 
-#define PAGE_MAIN				0x0000
-#define	PAGE_ENTITY_01			0x0001
-#define PAGE_ENTITY_SETTINGS	0x0002
+#define PFX_EF_IONRIPPER		13
+#define PFX_EF_GREENGIB			14
+#define	PFX_EF_TRAP				15
+#define	PFX_EF_TAGTRAIL			16
+#define PFX_EF_TRACKER			17
+#define PFX_EF_TRACKERTRAIL		18
+#define PFX_EF_BLASTER2			19
 
-void pfxSelectEntityPage01(edict_t *ent, pmenuhnd_t *p);
-void pfxEntityEffectsMenu(edict_t *ent, pmenuhnd_t *p);
+#define PAGE_MAIN				0x000F
+
+#define PAGE_ENTITY_SETTINGS	0x000C
+#define PAGE_POINT_SETTINGS		0x000D
+#define PAGE_LINE_SETTINGS		0x000E
+
+#define	PAGE_ENTITY_01			0x0000
+#define	PAGE_ENTITY_02			0x0001
+
+void pfxEditEntityEffect(edict_t *ent, pmenuhnd_t *p);
+void pfxEntityEffectsMenu02(edict_t *ent, pmenuhnd_t *p);
+void pfxEntityEffectsMenu01(edict_t *ent, pmenuhnd_t *p);
 void pfxMainMenu(edict_t* ent);
+
 void pfxSpawnEmitter(edict_t *ent, vec3_t g_offset);

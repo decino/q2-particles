@@ -1139,5 +1139,7 @@ struct edict_s
 	qboolean	pfx_hide_emitter;
 
 	int			last_menu;
+	int			prev_menu;
+	int			cursor_history[0x10];
 };
 

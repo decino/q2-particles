@@ -26,7 +26,7 @@ void pfxEditEntityEffect(edict_t *ent, pmenuhnd_t *p)
 	}
 	if (p->cur == 7)
 	{
-		ent->pfx_projectile_speed = 100 + ent->pfx_projectile_speed % 2000;
+		ent->pfx_projectile_speed = (ent->pfx_projectile_speed + 100) % 2100;
 		gi.dprintf("Projectile speed: %d\n", ent->pfx_projectile_speed);
 	}
 	/*
@@ -38,6 +38,18 @@ void pfxEditEntityEffect(edict_t *ent, pmenuhnd_t *p)
 		gi.dprintf("Hidden emitter: %d\n", ent->pfx_hide_emitter);
 	}
 	*/
+}
+
+void pfxEntityEffectsMenu(edict_t *ent, pmenuhnd_t *p)
+{
+	if (ent->prev_menu == PAGE_ENTITY_01)
+	{
+		pfxEntityEffectsMenu01(ent, p);
+	}
+	else
+	{
+		pfxEntityEffectsMenu02(ent, p);
+	}
 }
 
 pmenu_t entity_fx_settings[] = 
@@ -62,13 +74,52 @@ pmenu_t entity_fx_settings[] =
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 };
 
-void pfxSelectEntityPage01(edict_t *ent, pmenuhnd_t *p)
+void pfxSelectEntitySettings(edict_t *ent, pmenuhnd_t *p)
 {
+	ent->pfx_selected_fx = p->cur + (ent->last_menu * 10);
+	ent->prev_menu = ent->last_menu;
 	ent->last_menu = PAGE_ENTITY_SETTINGS;
-	ent->pfx_selected_fx = p->cur;
 
 	PMenu_Close(ent);
 	PMenu_Open(ent, entity_fx_settings, -1, sizeof(entity_fx_settings) / sizeof(pmenu_t), NULL);
+}
+
+pmenu_t entity_fx_menu_02[] = 
+{
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ "*Select Entity Effect",		PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ "Ion Ripper Trail",			PMENU_ALIGN_LEFT,	pfxSelectEntitySettings },
+	{ "Gekk Gib Trail",				PMENU_ALIGN_LEFT,	pfxSelectEntitySettings },
+	{ "Trap Vortex",				PMENU_ALIGN_LEFT,	pfxSelectEntitySettings },
+	{ "Tag Token Trail",			PMENU_ALIGN_LEFT,	pfxSelectEntitySettings },
+	{ "Tracker Trail",				PMENU_ALIGN_LEFT,	pfxSelectEntitySettings },
+	{ "Tracker Daemon",				PMENU_ALIGN_LEFT,	pfxSelectEntitySettings },
+	{ "Green Blaster Trail",		PMENU_ALIGN_LEFT,	pfxSelectEntitySettings },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ "",							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ "Previous",					PMENU_ALIGN_LEFT,	pfxEntityEffectsMenu01 },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+};
+
+void pfxEntityEffectsMenu02(edict_t *ent, pmenuhnd_t *p)
+{
+	ent->last_menu = PAGE_ENTITY_02;
+
+	PMenu_Close(ent);
+	PMenu_Open(ent, entity_fx_menu_02, -1, sizeof(entity_fx_menu_02) / sizeof(pmenu_t), NULL);
+}
+
+void pfxResetToMainMenu(edict_t *ent, pmenuhnd_t *p)
+{
+	ent->last_menu = PAGE_MAIN;
+	ent->prev_menu = ent->last_menu;
+
+	pfxMainMenu(ent);
 }
 
 pmenu_t entity_fx_menu_01[] = 
@@ -76,24 +127,24 @@ pmenu_t entity_fx_menu_01[] =
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 	{ "*Select Entity Effect",		PMENU_ALIGN_LEFT,	NULL },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
-	{ "Bloody Gib Trail",			PMENU_ALIGN_LEFT,	pfxSelectEntityPage01 },
-	{ "Blaster Trail",				PMENU_ALIGN_LEFT,	pfxSelectEntityPage01 },
-	{ "Grenade Smoke",				PMENU_ALIGN_LEFT,	pfxSelectEntityPage01 },
-	{ "Rocket Smoke",				PMENU_ALIGN_LEFT,	pfxSelectEntityPage01 },
-	{ "BFG Particles",				PMENU_ALIGN_LEFT,	pfxSelectEntityPage01 },
-	{ "Flies",						PMENU_ALIGN_LEFT,	pfxSelectEntityPage01 },
-	{ "Teleporter Fountain",		PMENU_ALIGN_LEFT,	pfxSelectEntityPage01 },
-	{ "Red Flag Particles",			PMENU_ALIGN_LEFT,	pfxSelectEntityPage01 },
-	{ "Blue Flag Particles",		PMENU_ALIGN_LEFT,	pfxSelectEntityPage01 },
-	{ "Quad Damage Trail",			PMENU_ALIGN_LEFT,	pfxSelectEntityPage01 },
-	{ "",							PMENU_ALIGN_LEFT,	NULL },
+	{ "Bloody Gib Trail",			PMENU_ALIGN_LEFT,	pfxSelectEntitySettings },
+	{ "Blaster Trail",				PMENU_ALIGN_LEFT,	pfxSelectEntitySettings },
+	{ "Grenade Smoke",				PMENU_ALIGN_LEFT,	pfxSelectEntitySettings },
+	{ "Rocket Smoke",				PMENU_ALIGN_LEFT,	pfxSelectEntitySettings },
+	{ "BFG Particles",				PMENU_ALIGN_LEFT,	pfxSelectEntitySettings },
+	{ "Flies",						PMENU_ALIGN_LEFT,	pfxSelectEntitySettings },
+	{ "Teleporter Fountain",		PMENU_ALIGN_LEFT,	pfxSelectEntitySettings },
+	{ "Red Flag Particles",			PMENU_ALIGN_LEFT,	pfxSelectEntitySettings },
+	{ "Blue Flag Particles",		PMENU_ALIGN_LEFT,	pfxSelectEntitySettings },
+	{ "Quad Damage Trail",			PMENU_ALIGN_LEFT,	pfxSelectEntitySettings },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
-	{ "Next",						PMENU_ALIGN_LEFT,	NULL },
-	{ "Previous",					PMENU_ALIGN_LEFT,	pfxMainMenu },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ "Next",						PMENU_ALIGN_LEFT,	pfxEntityEffectsMenu02 },
+	{ "Previous",					PMENU_ALIGN_LEFT,	pfxResetToMainMenu },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 };
 
-void pfxEntityEffectsMenu(edict_t *ent, pmenuhnd_t *p)
+void pfxEntityEffectsMenu01(edict_t *ent, pmenuhnd_t *p)
 {
 	ent->last_menu = PAGE_ENTITY_01;
 
@@ -125,7 +176,7 @@ pmenu_t main_menu[] =
 	{ "Shoot gun to spawn a",		PMENU_ALIGN_LEFT,	NULL },
 	{ "particle emitter.",			PMENU_ALIGN_LEFT,	NULL },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
-	{ "Entity Effects",				PMENU_ALIGN_LEFT,	pfxEntityEffectsMenu },
+	{ "Entity Effects",				PMENU_ALIGN_LEFT,	pfxEntityEffectsMenu01 },
 	{ "Point Effects",				PMENU_ALIGN_LEFT,	pfxPointEffectsMenu },
 	{ "Line Effects",				PMENU_ALIGN_LEFT,	pfxLineEffectsMenu },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
@@ -135,11 +186,14 @@ pmenu_t main_menu[] =
 
 void pfxMainMenu(edict_t* ent)
 {
+	PMenu_Close(ent);
+
 	switch (ent->last_menu)
 	{
-		case 0: PMenu_Open(ent, main_menu, -1, sizeof(main_menu) / sizeof(pmenu_t), NULL); break;
-		case 1: PMenu_Open(ent, entity_fx_menu_01, -1, sizeof(entity_fx_menu_01) / sizeof(pmenu_t), NULL); break;
-		case 2: PMenu_Open(ent, entity_fx_settings, -1, sizeof(entity_fx_settings) / sizeof(pmenu_t), NULL); break;
+		case PAGE_MAIN:				PMenu_Open(ent, main_menu, -1, sizeof(main_menu) / sizeof(pmenu_t), NULL); break;
+		case PAGE_ENTITY_SETTINGS:	PMenu_Open(ent, entity_fx_settings, -1, sizeof(entity_fx_settings) / sizeof(pmenu_t), NULL); break;
+		case PAGE_ENTITY_01:		PMenu_Open(ent, entity_fx_menu_01, -1, sizeof(entity_fx_menu_01) / sizeof(pmenu_t), NULL); break;
+		case PAGE_ENTITY_02:		PMenu_Open(ent, entity_fx_menu_02, -1, sizeof(entity_fx_menu_02) / sizeof(pmenu_t), NULL); break;
 	}
 }
 
@@ -147,18 +201,26 @@ int getEntityEffect(edict_t* ent)
 {
 	switch (ent->pfx_selected_fx)
 	{
-		case PFX_EF_GIB:		return EF_GIB;
-		case PFX_EF_BLASTER:	return EF_BLASTER;
-		case PFX_EF_GRENADE:	return EF_GRENADE;
-		case PFX_EF_ROCKET:		return EF_ROCKET;
-		case PFX_EF_BFG:		return EF_BFG;				// TODO: Work without anim fast.
-		case PFX_EF_FLIES:		return EF_FLIES;
-		case PFX_EF_TELEPORTER: return EF_TELEPORTER;
-		case PFX_EF_FLAG1:		return EF_FLAG1;
-		case PFX_EF_FLAG2:		return EF_FLAG2;
-		case PFX_UNDEF_QUAD:	return EF_FLAG2|EF_TRACKER;	// TODO: edit client.
+		case PFX_EF_GIB:			return EF_GIB;
+		case PFX_EF_BLASTER:		return EF_BLASTER;
+		case PFX_EF_GRENADE:		return EF_GRENADE;
+		case PFX_EF_ROCKET:			return EF_ROCKET;
+		case PFX_EF_BFG:			return EF_BFG;				// TODO: Work without anim fast.
+		case PFX_EF_FLIES:			return EF_FLIES;
+		case PFX_EF_TELEPORTER:		return EF_TELEPORTER;
+		case PFX_EF_FLAG1:			return EF_FLAG1;
+		case PFX_EF_FLAG2:			return EF_FLAG2;
+		case PFX_UNDEF_QUAD:		return EF_FLAG2|EF_TRACKER;	// TODO: edit client.
 
-		default:				return 0x00000000;
+		case PFX_EF_IONRIPPER:		return EF_IONRIPPER;
+		case PFX_EF_GREENGIB:		return EF_GREENGIB;
+		case PFX_EF_TRAP:			return EF_TRAP;
+		case PFX_EF_TAGTRAIL:		return EF_TAGTRAIL;
+		case PFX_EF_TRACKER:		return EF_TRACKER;
+		case PFX_EF_TRACKERTRAIL:	return EF_TRACKERTRAIL;
+		case PFX_EF_BLASTER2:		return EF_BLASTER|EF_TRACKER;
+
+		default:					return 0x00000000;
 	}
 }
 
@@ -182,6 +244,7 @@ void pfxEmitterThink(edict_t* ent)
 	VectorClear(projectile->maxs);
 	projectile->s.modelindex = gi.modelindex("models/objects/flash/tris.md2");
 	projectile->touch = G_FreeEdict;
+
 	gi.linkentity(projectile);
 
 	ent->nextthink = level.time + (1.0f / (float)ent->owner->pfx_frequency);
