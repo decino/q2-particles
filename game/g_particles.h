@@ -50,6 +50,21 @@
 #define PFX_TE_ELECTRIC_SPARKS		51
 #define PFX_TE_TRACKER_EXPLOSION	52
 
+#define PFX_UNDEF_TRACKER			53
+#define PFX_TE_WIDOWBEAMOUT			54
+#define PFX_TE_WIDOWSPLASH			55
+#define PFX_TE_MONSTER_HEATBEAM		56
+#define PFX_TE_NUKEBLAST			57
+#define	PFX_TE_FLAME				58
+#define	PFX_UNDEF_GENERIC			59
+
+#define	PFX_TE_RAILTRAIL			63
+#define PFX_TE_BUBBLETRAIL			64
+#define PFX_TE_DEBUGTRAIL			65
+#define PFX_TE_FORCEWALL			66
+#define PFX_TE_BUBBLETRAIL2			67
+#define PFX_TE_HEATBEAM				68
+
 #define PAGE_MAIN				0x000F
 
 #define PAGE_ENTITY_SETTINGS	0x000C
@@ -61,8 +76,14 @@
 #define PAGE_POINT_01			0x0002
 #define PAGE_POINT_02			0x0003
 #define PAGE_POINT_03			0x0004
+#define PAGE_POINT_04			0x0005
+#define PAGE_LINE_01			0x0006
+
+void updateLineEffectsMenu(edict_t *ent, pmenuhnd_t *p);
+void pfxLineEffectsMenu01(edict_t *ent, pmenuhnd_t *p);
 
 void updatePointEffectsMenu(edict_t *ent, pmenuhnd_t *p);
+void pfxPointEffectsMenu04(edict_t *ent, pmenuhnd_t *p);
 void pfxPointEffectsMenu03(edict_t *ent, pmenuhnd_t *p);
 void pfxPointEffectsMenu02(edict_t *ent, pmenuhnd_t *p);
 void pfxPointEffectsMenu01(edict_t *ent, pmenuhnd_t *p);

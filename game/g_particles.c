@@ -1,6 +1,87 @@
 #include "g_local.h"
 
 // =============================================================================================================================
+// Line Particle Effects
+// =============================================================================================================================
+void pfxEditLineEffect(edict_t *ent, pmenuhnd_t *p)
+{
+	if (p->cur == 4)
+	{
+		ent->pfx_frequency = 1 + ent->pfx_frequency % 10;
+	}
+	updateLineEffectsMenu(ent, p);
+}
+
+pmenu_t line_fx_settings[] = 
+{
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ "*Line Effect Settings",		PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ "*Frequency (Hz)",			PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ "Previous",					PMENU_ALIGN_LEFT,	pfxLineEffectsMenu01 },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+};
+
+void updateLineEffectsMenu(edict_t *ent, pmenuhnd_t *p)
+{
+	static char frequency[8];
+
+	sprintf(frequency, "%d", ent->pfx_frequency);
+
+	PMenu_UpdateEntry(p->entries + 4, frequency, PMENU_ALIGN_LEFT, pfxEditLineEffect);
+	PMenu_Update(ent);
+}
+
+void pfxSelectLineSettings(edict_t *ent, pmenuhnd_t *p)
+{
+	if (ent->last_menu != PAGE_LINE_SETTINGS)
+	{
+		ent->pfx_selected_fx = p->cur + (ent->last_menu * 10);
+		ent->prev_menu = ent->last_menu;
+	}
+	ent->last_menu = PAGE_LINE_SETTINGS;
+
+	PMenu_Close(ent);
+	PMenu_Open(ent, line_fx_settings, -1, sizeof(line_fx_settings) / sizeof(pmenu_t), NULL);
+
+	updateLineEffectsMenu(ent, p);
+}
+
+pmenu_t line_fx_menu_01[] = 
+{
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ "*Select Line Effect",		PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ "Railgun Trail",				PMENU_ALIGN_LEFT,	pfxSelectLineSettings },
+	{ "Bubble Trail",				PMENU_ALIGN_LEFT,	pfxSelectLineSettings },
+	{ "Debug Trail",				PMENU_ALIGN_LEFT,	pfxSelectLineSettings },
+	{ "Forcewall",					PMENU_ALIGN_LEFT,	pfxSelectLineSettings },
+	{ "Heat Beam Bubbles",			PMENU_ALIGN_LEFT,	pfxSelectLineSettings },
+	{ "Heat Beam",					PMENU_ALIGN_LEFT,	pfxSelectLineSettings },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ "Previous",					PMENU_ALIGN_LEFT,	pfxResetToMainMenu },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+};
+
+// =============================================================================================================================
 // Point Particle Effects
 // =============================================================================================================================
 void pfxEditPointEffect(edict_t *ent, pmenuhnd_t *p)
@@ -80,9 +161,13 @@ void pfxPointEffectsMenu(edict_t *ent, pmenuhnd_t *p)
 	{
 		pfxPointEffectsMenu02(ent, p);
 	}
-	else
+	else if (ent->prev_menu == PAGE_POINT_03)
 	{
 		pfxPointEffectsMenu03(ent, p);
+	}
+	else
+	{
+		pfxPointEffectsMenu04(ent, p);
 	}
 }
 
@@ -183,6 +268,36 @@ void pfxSelectPointSettings(edict_t *ent, pmenuhnd_t *p)
 	updatePointEffectsMenu(ent, p);
 }
 
+pmenu_t point_fx_menu_04[] = 
+{
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ "*Select Point Effect",		PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ "Tracker Explosion (Unused)",	PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
+	{ "Widow Beam Out",				PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
+	{ "Widow Splash",				PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
+	{ "Widow Heat Beam",			PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
+	{ "Nuke Blast",					PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
+	{ "Flame (Unused)",				PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
+	{ "Generic Effect (Unused)",	PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ "Previous",					PMENU_ALIGN_LEFT,	pfxPointEffectsMenu03 },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+};
+
+void pfxPointEffectsMenu04(edict_t *ent, pmenuhnd_t *p)
+{
+	ent->last_menu = PAGE_POINT_04;
+
+	PMenu_Close(ent);
+	PMenu_Open(ent, point_fx_menu_04, -1, sizeof(point_fx_menu_04) / sizeof(pmenu_t), NULL);
+}
+
 pmenu_t point_fx_menu_03[] = 
 {
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
@@ -197,10 +312,10 @@ pmenu_t point_fx_menu_03[] =
 	{ "Chainfist Smoke",			PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
 	{ "More Blood Impact",			PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
 	{ "Electric Sparks",			PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
-	{ "Tracker Explosion (Unused)",	PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
+	{ "Tracker Explosion",			PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
-	{ "Next",						PMENU_ALIGN_LEFT,	pfxPointEffectsMenu02 },
+	{ "Next",						PMENU_ALIGN_LEFT,	pfxPointEffectsMenu04 },
 	{ "Previous",					PMENU_ALIGN_LEFT,	pfxPointEffectsMenu02 },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 };
@@ -436,9 +551,12 @@ void pfxPointEffectsMenu01(edict_t *ent, pmenuhnd_t *p)
 	PMenu_Open(ent, point_fx_menu_01, -1, sizeof(point_fx_menu_01) / sizeof(pmenu_t), NULL);
 }
 
-void pfxLineEffectsMenu(edict_t *ent, pmenuhnd_t *p)
+void pfxLineEffectsMenu01(edict_t *ent, pmenuhnd_t *p)
 {
+	ent->last_menu = PAGE_LINE_01;
+
 	PMenu_Close(ent);
+	PMenu_Open(ent, line_fx_menu_01, -1, sizeof(line_fx_menu_01) / sizeof(pmenu_t), NULL);
 }
 
 pmenu_t main_menu[] = 
@@ -457,7 +575,7 @@ pmenu_t main_menu[] =
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 	{ "Entity Effects",				PMENU_ALIGN_LEFT,	pfxEntityEffectsMenu01 },
 	{ "Point Effects",				PMENU_ALIGN_LEFT,	pfxPointEffectsMenu01 },
-	{ "Line Effects",				PMENU_ALIGN_LEFT,	pfxLineEffectsMenu },
+	{ "Line Effects",				PMENU_ALIGN_LEFT,	pfxLineEffectsMenu01 },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 	{ "*www.youtube.com/c/decino",	PMENU_ALIGN_LEFT,	NULL },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
@@ -477,6 +595,10 @@ void pfxMainMenu(edict_t* ent)
 		case PAGE_POINT_01:			PMenu_Open(ent, point_fx_menu_01, -1, sizeof(point_fx_menu_01) / sizeof(pmenu_t), NULL); break;
 		case PAGE_POINT_02:			PMenu_Open(ent, point_fx_menu_02, -1, sizeof(point_fx_menu_02) / sizeof(pmenu_t), NULL); break;
 		case PAGE_POINT_03:			PMenu_Open(ent, point_fx_menu_03, -1, sizeof(point_fx_menu_03) / sizeof(pmenu_t), NULL); break;
+		case PAGE_POINT_04:			PMenu_Open(ent, point_fx_menu_04, -1, sizeof(point_fx_menu_04) / sizeof(pmenu_t), NULL); break;
+		case PAGE_LINE_01:			PMenu_Open(ent, line_fx_menu_01, -1, sizeof(line_fx_menu_01) / sizeof(pmenu_t), NULL); break;
+
+		default:					PMenu_Open(ent, main_menu, -1, sizeof(main_menu) / sizeof(pmenu_t), NULL); break;
 	}
 }
 
@@ -493,7 +615,7 @@ int getEntityEffect(int selected_fx)
 		case PFX_EF_TELEPORTER:		return EF_TELEPORTER;
 		case PFX_EF_FLAG1:			return EF_FLAG1;
 		case PFX_EF_FLAG2:			return EF_FLAG2;
-		case PFX_UNDEF_QUAD:		return EF_FLAG2|EF_TRACKER;		// TODO: edit client.
+		case PFX_UNDEF_QUAD:		return EF_FLAG2|EF_TRACKER;		// TODO: Edit client.
 
 		case PFX_EF_IONRIPPER:		return EF_IONRIPPER;
 		case PFX_EF_GREENGIB:		return EF_GREENGIB;
@@ -540,7 +662,30 @@ int getPointEffect(int selected_fx)
 		case PFX_TE_ELECTRIC_SPARKS:	return TE_ELECTRIC_SPARKS;
 		case PFX_TE_TRACKER_EXPLOSION:	return TE_TRACKER_EXPLOSION;
 
+		case PFX_UNDEF_TRACKER:			return TE_EXPLOSION1_BIG;	// TODO: Edit client.
+		case PFX_TE_WIDOWBEAMOUT:		return TE_WIDOWBEAMOUT;
+		case PFX_TE_WIDOWSPLASH:		return TE_WIDOWSPLASH;
+		case PFX_TE_MONSTER_HEATBEAM:	return TE_MONSTER_HEATBEAM;	// TODO: Edit client.
+		case PFX_TE_NUKEBLAST:			return TE_NUKEBLAST;
+		case PFX_TE_FLAME:				return TE_FLAME;			// TODO: Edit client.
+		case PFX_UNDEF_GENERIC:			return TE_PLASMA_EXPLOSION;	// TODO: Edit client.
+
 		default:						return 0x00000000;
+	}
+}
+
+int getLineEffect(int selected_fx)
+{
+	switch (selected_fx)
+	{
+		case PFX_TE_RAILTRAIL:				return TE_RAILTRAIL;
+		case PFX_TE_BUBBLETRAIL:			return TE_BUBBLETRAIL;
+		case PFX_TE_DEBUGTRAIL:				return TE_DEBUGTRAIL;
+		case PFX_TE_FORCEWALL:				return TE_FORCEWALL;
+		case PFX_TE_BUBBLETRAIL2:			return TE_BUBBLETRAIL2;
+		case PFX_TE_HEATBEAM:				return TE_HEATBEAM;
+
+		default:							return 0x00000000;
 	}
 }
 
@@ -550,7 +695,7 @@ int getPointEffect(int selected_fx)
 void pfxEmitterThink(edict_t* ent)
 {
 	edict_t*	projectile;
-	vec3_t		dir;
+	vec3_t		dir, end;
 
 	int selected_fx = ent->owner->pfx_selected_fx;
 
@@ -592,13 +737,13 @@ void pfxEmitterThink(edict_t* ent)
 	{
 		ent->s.event = EV_ITEM_RESPAWN;
 	}
-	else if (selected_fx >= PFX_TE_BLOOD) // && <= PFX_???)
+	else if (selected_fx >= PFX_TE_BLOOD && selected_fx <= PFX_UNDEF_GENERIC)
 	{
 		gi.WriteByte(svc_temp_entity);
 		gi.WriteByte(getPointEffect(selected_fx));
 
-		// Steam stuff.
-		if (selected_fx == PFX_TE_STEAM)
+		// Steam and Widow IDs.
+		if (selected_fx == PFX_TE_STEAM || selected_fx == PFX_TE_WIDOWBEAMOUT)
 		{
 			gi.WriteShort(-1);
 		}
@@ -623,7 +768,13 @@ void pfxEmitterThink(edict_t* ent)
 			selected_fx != PFX_TE_TELEPORT			&& 
 			selected_fx != PFX_TE_BOSSTPORT			&&
 			selected_fx != PFX_TE_TRACKER_EXPLOSION	&&
-			selected_fx != PFX_TE_CHAINFIST_SMOKE)
+			selected_fx != PFX_TE_CHAINFIST_SMOKE	&&
+			selected_fx != PFX_UNDEF_TRACKER		&&
+			selected_fx != PFX_TE_WIDOWBEAMOUT		&&
+			selected_fx != PFX_TE_WIDOWSPLASH		&&
+			selected_fx != PFX_TE_MONSTER_HEATBEAM	&&
+			selected_fx != PFX_TE_NUKEBLAST			&&
+			selected_fx != PFX_TE_FLAME)
 		{
 			gi.WriteDir(dir);
 		}
@@ -653,6 +804,22 @@ void pfxEmitterThink(edict_t* ent)
 			gi.WriteShort(ent->owner->pfx_steam_magnitude);
 		}
 		gi.multicast(ent->s.origin, MULTICAST_PVS);
+	}
+	else
+	{
+		// Line effects.
+		trace_t	trace;
+		vec3_t	start;
+
+		VectorCopy(ent->s.origin, start);
+		VectorMA(start, 8192, dir, end);
+		trace = gi.trace(start, NULL, NULL, end, ent->owner, MASK_SHOT);
+
+		gi.WriteByte(svc_temp_entity);
+		gi.WriteByte(getLineEffect(ent->owner->pfx_selected_fx));
+		gi.WritePosition(start);
+		gi.WritePosition(trace.endpos);
+		gi.multicast(trace.endpos, MULTICAST_PHS);
 	}
 	ent->nextthink = level.time + (1.0f / (float)ent->owner->pfx_frequency);
 }
