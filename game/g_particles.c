@@ -9,6 +9,13 @@ void pfxEditLineEffect(edict_t *ent, pmenuhnd_t *p)
 	{
 		ent->pfx_frequency = 1 + ent->pfx_frequency % 10;
 	}
+	if (p->cur == 7)
+	{
+		if (ent->pfx_selected_fx == PFX_TE_FORCEWALL)
+		{
+			ent->pfx_colour = (ent->pfx_colour + 1) % 256;
+		}
+	}
 	updateLineEffectsMenu(ent, p);
 }
 
@@ -37,10 +44,22 @@ pmenu_t line_fx_settings[] =
 void updateLineEffectsMenu(edict_t *ent, pmenuhnd_t *p)
 {
 	static char frequency[8];
+	static char colour[4];
 
 	sprintf(frequency, "%d", ent->pfx_frequency);
-
 	PMenu_UpdateEntry(p->entries + 4, frequency, PMENU_ALIGN_LEFT, pfxEditLineEffect);
+
+	// Colour.
+	switch (ent->pfx_selected_fx)
+	{
+		case PFX_TE_FORCEWALL:
+
+		PMenu_UpdateEntry(p->entries + 6, "*Colour", PMENU_ALIGN_LEFT, NULL);
+		sprintf(colour, "%d", ent->pfx_colour);
+		PMenu_UpdateEntry(p->entries + 7, colour, PMENU_ALIGN_LEFT, pfxEditLineEffect);
+
+		break;
+	}
 	PMenu_Update(ent);
 }
 
@@ -596,6 +615,7 @@ void pfxMainMenu(edict_t* ent)
 		case PAGE_POINT_02:			PMenu_Open(ent, point_fx_menu_02, -1, sizeof(point_fx_menu_02) / sizeof(pmenu_t), NULL); break;
 		case PAGE_POINT_03:			PMenu_Open(ent, point_fx_menu_03, -1, sizeof(point_fx_menu_03) / sizeof(pmenu_t), NULL); break;
 		case PAGE_POINT_04:			PMenu_Open(ent, point_fx_menu_04, -1, sizeof(point_fx_menu_04) / sizeof(pmenu_t), NULL); break;
+		case PAGE_LINE_SETTINGS:	PMenu_Open(ent, line_fx_settings, -1, sizeof(line_fx_settings) / sizeof(pmenu_t), NULL); pfxSelectLineSettings(ent, ent->client->menu); break;
 		case PAGE_LINE_01:			PMenu_Open(ent, line_fx_menu_01, -1, sizeof(line_fx_menu_01) / sizeof(pmenu_t), NULL); break;
 
 		default:					PMenu_Open(ent, main_menu, -1, sizeof(main_menu) / sizeof(pmenu_t), NULL); break;
@@ -817,9 +837,24 @@ void pfxEmitterThink(edict_t* ent)
 
 		gi.WriteByte(svc_temp_entity);
 		gi.WriteByte(getLineEffect(ent->owner->pfx_selected_fx));
+
+		if (selected_fx == PFX_TE_HEATBEAM)
+		{
+			gi.WriteShort(ent - g_edicts);
+		}
 		gi.WritePosition(start);
 		gi.WritePosition(trace.endpos);
-		gi.multicast(trace.endpos, MULTICAST_PHS);
+
+		// Colour.
+		switch (selected_fx)
+		{
+			case PFX_TE_FORCEWALL:
+
+			gi.WriteByte(ent->owner->pfx_colour);
+
+			break;
+		}
+		gi.multicast(start, MULTICAST_PHS);
 	}
 	ent->nextthink = level.time + (1.0f / (float)ent->owner->pfx_frequency);
 }
