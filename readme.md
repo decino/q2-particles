@@ -1,5 +1,5 @@
 # Particle Effect Tester v1.0
-A Quake II mod where can test and spawn any preprogrammed particle effect.
+A Quake II mod where you can test and spawn any preprogrammed particle effect.
 
 -----
 ##### Download
@@ -20,4 +20,4 @@ id Software
 > https://github.com/id-Software/Quake-2
 
 Mark Shan (for v3.24)
->http://www.markshan.com/knightmare/
+> http://www.markshan.com/knightmare/
