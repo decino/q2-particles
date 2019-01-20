@@ -1276,8 +1276,16 @@ void CL_AddPacketEntities (frame_t *frame)
 			}
 			else if (effects & EF_FLAG2)
 			{
-				CL_FlagTrail (cent->lerp_origin, ent.origin, 115);
-				V_AddLight (ent.origin, 225, 0.1, 0.1, 1);
+				// Unused quad trail particle effect hack.
+				if (effects & EF_TRACKER)
+				{
+					CL_QuadTrail(cent->lerp_origin, ent.origin);
+				}
+				else
+				{
+					CL_FlagTrail (cent->lerp_origin, ent.origin, 115);
+					V_AddLight (ent.origin, 225, 0.1, 0.1, 1);
+				}
 			}
 //======
 //ROGUE
