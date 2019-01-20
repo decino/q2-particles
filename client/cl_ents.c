@@ -1240,6 +1240,7 @@ void CL_AddPacketEntities (frame_t *frame)
 			}
 			else if (effects & EF_BFG)
 			{
+				/*
 				static int bfg_lightramp[6] = {300, 400, 600, 300, 150, 75};
 
 				if (effects & EF_ANIM_ALLFAST)
@@ -1251,6 +1252,10 @@ void CL_AddPacketEntities (frame_t *frame)
 				{
 					i = bfg_lightramp[s1->frame];
 				}
+				*/
+				CL_BfgParticles (&ent);
+				i = 200;
+
 				V_AddLight (ent.origin, i, 0, 1, 0);
 			}
 			// RAFAEL

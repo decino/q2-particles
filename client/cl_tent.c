@@ -199,8 +199,8 @@ re.RegisterPic ("a_grenades");
 //ROGUE
 	cl_mod_explo4_big = re.RegisterModel ("models/objects/r_explode2/tris.md2");
 	cl_mod_lightning = re.RegisterModel ("models/proj/lightning/tris.md2");
-	cl_mod_heatbeam = re.RegisterModel ("models/proj/beam/tris.md2");
-	cl_mod_monster_heatbeam = re.RegisterModel ("models/proj/widowbeam/tris.md2");
+	cl_mod_heatbeam = re.RegisterModel ("models/objects/flash/tris.md2");
+	cl_mod_monster_heatbeam = re.RegisterModel ("models/objects/smoke/tris.md2");
 //ROGUE
 }	
 
@@ -420,10 +420,12 @@ int CL_ParsePlayerBeam (struct model_s *model)
 	MSG_ReadPos (&net_message, end);
 	// PMM - network optimization
 	if (model == cl_mod_heatbeam)
-		VectorSet(offset, 2, 7, -3);
+	{
+		VectorSet(offset, 0, 0, 0);
+	}
 	else if (model == cl_mod_monster_heatbeam)
 	{
-		model = cl_mod_heatbeam;
+		//model = cl_mod_heatbeam;
 		VectorSet(offset, 0, 0, 0);
 	}
 	else
@@ -877,7 +879,9 @@ void CL_ParseTEnt (void)
 		break;
 	
 	case TE_EXPLOSION1:
+	/*
 	case TE_EXPLOSION1_BIG:						// PMM
+	*/
 	case TE_ROCKET_EXPLOSION:
 	case TE_ROCKET_EXPLOSION_WATER:
 	case TE_EXPLOSION1_NP:						// PMM
@@ -1129,7 +1133,13 @@ void CL_ParseTEnt (void)
 		break;
 
 	case TE_MONSTER_HEATBEAM:
+		
 		ent = CL_ParsePlayerBeam (cl_mod_monster_heatbeam);
+		
+		// Monster heat beam particle hack.
+		//MSG_ReadPos(&net_message, pos);
+		//CL_MonsterPlasma_Shell(pos);
+
 		break;
 
 	case TE_HEATBEAM_SPARKS:
@@ -1200,6 +1210,21 @@ void CL_ParseTEnt (void)
 		CL_ColorExplosionParticles (pos, 0, 1);
 //		CL_Tracker_Explode (pos);
 		S_StartSound (pos, 0, 0, cl_sfx_disrexp, 1, ATTN_NORM, 0);
+		break;
+
+	// Unused tracker explosion hack.
+	case TE_EXPLOSION1_BIG:
+		MSG_ReadPos (&net_message, pos);
+		CL_ColorFlash (pos, 0, 150, -1, -1, -1);
+//		CL_ColorExplosionParticles (pos, 0, 1);
+		CL_Tracker_Explode (pos);
+		S_StartSound (pos, 0, 0, cl_sfx_disrexp, 1, ATTN_NORM, 0);
+		break;
+
+	// Flame restoration.
+	case TE_FLAME:
+		MSG_ReadPos(&net_message, pos);
+		CL_FlameEffects(pos);
 		break;
 
 	case TE_TELEPORT_EFFECT:
@@ -1410,8 +1435,14 @@ void CL_AddPlayerBeams (void)
 	for (i=0, b=cl_playerbeams ; i< MAX_BEAMS ; i++, b++)
 	{
 		vec3_t		f,r,u;
+
 		if (!b->model || b->endtime < cl.time)
 			continue;
+
+		if (cl_mod_monster_heatbeam && (b->model == cl_mod_monster_heatbeam))
+		{
+			CL_MonsterPlasma_Shell(b->start);
+		}
 
 		if(cl_mod_heatbeam && (b->model == cl_mod_heatbeam))
 		{
@@ -1507,7 +1538,7 @@ void CL_AddPlayerBeams (void)
 		{
 			if (b->entity != cl.playernum+1)
 			{
-				framenum = 2;
+				framenum = 0;
 //				Com_Printf ("Third person\n");
 				ent.angles[0] = -pitch;
 				ent.angles[1] = yaw + 180.0;
@@ -1525,19 +1556,18 @@ void CL_AddPlayerBeams (void)
 				else
 				{
 					// if it's a monster, do the particle effect
-					CL_MonsterPlasma_Shell(b->start);
+					//CL_MonsterPlasma_Shell(b->start);
 				}
 			}
 			else
 			{
-				framenum = 1;
+				framenum = 0;
 			}
 		}
-
 		// if it's the heatbeam, draw the particle effect
-		if ((cl_mod_heatbeam && (b->model == cl_mod_heatbeam) && (b->entity == cl.playernum+1)))
+		if ((cl_mod_heatbeam && (b->model == cl_mod_heatbeam) /* && (b->entity == cl.playernum+1) */ ))
 		{
-			CL_Heatbeam (org, dist);
+			CL_Heatbeam (b->start, dist);
 		}
 
 	// add new entities for the beams
@@ -1609,7 +1639,7 @@ void CL_AddPlayerBeams (void)
 			}
 			
 //			Com_Printf("B: %d -> %d\n", b->entity, b->dest_entity);
-			V_AddEntity (&ent);
+//			V_AddEntity (&ent);
 
 			for (j=0 ; j<3 ; j++)
 				org[j] += dist[j]*len;

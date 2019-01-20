@@ -630,12 +630,12 @@ int getEntityEffect(int selected_fx)
 		case PFX_EF_BLASTER:		return EF_BLASTER;
 		case PFX_EF_GRENADE:		return EF_GRENADE;
 		case PFX_EF_ROCKET:			return EF_ROCKET;
-		case PFX_EF_BFG:			return EF_BFG;					// TODO: Work without anim fast.
+		case PFX_EF_BFG:			return EF_BFG;
 		case PFX_EF_FLIES:			return EF_FLIES;
 		case PFX_EF_TELEPORTER:		return EF_TELEPORTER;
 		case PFX_EF_FLAG1:			return EF_FLAG1;
 		case PFX_EF_FLAG2:			return EF_FLAG2;
-		case PFX_UNDEF_QUAD:		return EF_FLAG2|EF_TRACKER;		// TODO: Edit client.
+		case PFX_UNDEF_QUAD:		return EF_FLAG2|EF_TRACKER;
 
 		case PFX_EF_IONRIPPER:		return EF_IONRIPPER;
 		case PFX_EF_GREENGIB:		return EF_GREENGIB;
@@ -682,7 +682,7 @@ int getPointEffect(int selected_fx)
 		case PFX_TE_ELECTRIC_SPARKS:	return TE_ELECTRIC_SPARKS;
 		case PFX_TE_TRACKER_EXPLOSION:	return TE_TRACKER_EXPLOSION;
 
-		case PFX_UNDEF_TRACKER:			return TE_EXPLOSION1_BIG;	// TODO: Edit client.
+		case PFX_UNDEF_TRACKER:			return TE_EXPLOSION1_BIG;
 		case PFX_TE_WIDOWBEAMOUT:		return TE_WIDOWBEAMOUT;
 		case PFX_TE_WIDOWSPLASH:		return TE_WIDOWSPLASH;
 		case PFX_TE_MONSTER_HEATBEAM:	return TE_MONSTER_HEATBEAM;	// TODO: Edit client.
@@ -757,7 +757,7 @@ void pfxEmitterThink(edict_t* ent)
 	{
 		ent->s.event = EV_ITEM_RESPAWN;
 	}
-	else if (selected_fx >= PFX_TE_BLOOD && selected_fx <= PFX_UNDEF_GENERIC)
+	else if (selected_fx >= PFX_TE_BLOOD && selected_fx <= PFX_UNDEF_GENERIC && selected_fx != PFX_TE_MONSTER_HEATBEAM) // Yeah, the monster heatbeam isn't actually a point effect.
 	{
 		gi.WriteByte(svc_temp_entity);
 		gi.WriteByte(getPointEffect(selected_fx));
@@ -831,14 +831,21 @@ void pfxEmitterThink(edict_t* ent)
 		trace_t	trace;
 		vec3_t	start;
 
+		int line_effect = getLineEffect(selected_fx);
+
+		// Nasty stuff right here.
+		if (selected_fx == PFX_TE_MONSTER_HEATBEAM)
+		{
+			line_effect = TE_MONSTER_HEATBEAM;
+		}
 		VectorCopy(ent->s.origin, start);
 		VectorMA(start, 8192, dir, end);
 		trace = gi.trace(start, NULL, NULL, end, ent->owner, MASK_SHOT);
 
 		gi.WriteByte(svc_temp_entity);
-		gi.WriteByte(getLineEffect(ent->owner->pfx_selected_fx));
+		gi.WriteByte(line_effect);
 
-		if (selected_fx == PFX_TE_HEATBEAM)
+		if (selected_fx == PFX_TE_HEATBEAM || selected_fx == PFX_TE_MONSTER_HEATBEAM)
 		{
 			gi.WriteShort(ent - g_edicts);
 		}
