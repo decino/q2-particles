@@ -4,7 +4,7 @@ A Quake II mod where can test and spawn any preprogrammed particle effect.
 -----
 ##### Download
 Latest version (1.0) was released on 20/01/2019.
-> Windows:http://decino.nl/files/pfx/pfx_v1.0.zip
+> Windows: http://decino.nl/files/pfx/pfx_v1.0.zip
 
 -----
 ##### How to Play
