@@ -1,9 +1,6 @@
 # Particle Effect Tester v1.0
 A Quake II mod where can test and spawn any preprogrammed particle effect.
 
-<a href="https://www.youtube.com/watch?v=2Ro_SqyEqK4
-" target="_blank">width="720" height="405" border="2" /></a>
-
 -----
 ##### Download
 Latest version (1.0) was released on 20/01/2019.
