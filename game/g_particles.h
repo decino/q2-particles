@@ -60,8 +60,10 @@
 #define	PAGE_ENTITY_02			0x0001
 #define PAGE_POINT_01			0x0002
 #define PAGE_POINT_02			0x0003
+#define PAGE_POINT_03			0x0004
 
 void updatePointEffectsMenu(edict_t *ent, pmenuhnd_t *p);
+void pfxPointEffectsMenu03(edict_t *ent, pmenuhnd_t *p);
 void pfxPointEffectsMenu02(edict_t *ent, pmenuhnd_t *p);
 void pfxPointEffectsMenu01(edict_t *ent, pmenuhnd_t *p);
 

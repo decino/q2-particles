@@ -18,6 +18,7 @@ void pfxEditPointEffect(edict_t *ent, pmenuhnd_t *p)
 			case PFX_TE_LASER_SPARKS:
 			case PFX_TE_WELDING_SPARKS:
 			case PFX_TE_TUNNEL_SPARKS:
+			case PFX_TE_STEAM:
 
 			ent->pfx_num = (ent->pfx_num << 1);
 
@@ -46,10 +47,24 @@ void pfxEditPointEffect(edict_t *ent, pmenuhnd_t *p)
 			case PFX_TE_LASER_SPARKS:
 			case PFX_TE_WELDING_SPARKS:
 			case PFX_TE_TUNNEL_SPARKS:
+			case PFX_TE_STEAM:
 
 			ent->pfx_colour = (ent->pfx_colour + 1) % 256;
 
 			break;
+		}
+	}
+	if (p->cur == 13)
+	{
+		// Steam magnitude.
+		if (ent->pfx_selected_fx == PFX_TE_STEAM)
+		{
+			ent->pfx_steam_magnitude = (ent->pfx_steam_magnitude << 1);
+
+			if (ent->pfx_steam_magnitude == 0x00 || ent->pfx_steam_magnitude > 2048)
+			{
+				ent->pfx_steam_magnitude = 1;
+			}
 		}
 	}
 	updatePointEffectsMenu(ent, p);
@@ -61,9 +76,13 @@ void pfxPointEffectsMenu(edict_t *ent, pmenuhnd_t *p)
 	{
 		pfxPointEffectsMenu01(ent, p);
 	}
-	else
+	else if (ent->prev_menu == PAGE_POINT_02)
 	{
 		pfxPointEffectsMenu02(ent, p);
+	}
+	else
+	{
+		pfxPointEffectsMenu03(ent, p);
 	}
 }
 
@@ -95,6 +114,7 @@ void updatePointEffectsMenu(edict_t *ent, pmenuhnd_t *p)
 	static char num[4];
 	static char splash_index[4];
 	static char colour[4];
+	static char magnitude[8];
 
 	sprintf(frequency, "%d", ent->pfx_frequency);
 	PMenu_UpdateEntry(p->entries + 4, frequency, PMENU_ALIGN_LEFT, pfxEditPointEffect);
@@ -106,6 +126,7 @@ void updatePointEffectsMenu(edict_t *ent, pmenuhnd_t *p)
 		case PFX_TE_LASER_SPARKS:
 		case PFX_TE_TUNNEL_SPARKS:
 		case PFX_TE_WELDING_SPARKS:
+		case PFX_TE_STEAM:
 		
 		PMenu_UpdateEntry(p->entries + 6, "*Number of Particles", PMENU_ALIGN_LEFT, NULL);
 		sprintf(num, "%d", ent->pfx_num);
@@ -113,6 +134,7 @@ void updatePointEffectsMenu(edict_t *ent, pmenuhnd_t *p)
 
 		break;
 	}
+
 	// Splash index.
 	if (ent->pfx_selected_fx == PFX_TE_SPLASH)
 	{
@@ -120,18 +142,28 @@ void updatePointEffectsMenu(edict_t *ent, pmenuhnd_t *p)
 		sprintf(splash_index, "%d", ent->pfx_splash_index);
 		PMenu_UpdateEntry(p->entries + 10, splash_index, PMENU_ALIGN_LEFT, pfxEditPointEffect);
 	}
+
 	// Colour.
 	switch (ent->pfx_selected_fx)
 	{
 		case PFX_TE_LASER_SPARKS:
 		case PFX_TE_TUNNEL_SPARKS:
 		case PFX_TE_WELDING_SPARKS:
+		case PFX_TE_STEAM:
 
 		PMenu_UpdateEntry(p->entries + 9, "*Colour", PMENU_ALIGN_LEFT, NULL);
 		sprintf(colour, "%d", ent->pfx_colour);
 		PMenu_UpdateEntry(p->entries + 10, colour, PMENU_ALIGN_LEFT, pfxEditPointEffect);
 
 		break;
+	}
+
+	// Steam magnitude.
+	if (ent->pfx_selected_fx == PFX_TE_STEAM)
+	{
+		PMenu_UpdateEntry(p->entries + 12, "*Magnitude", PMENU_ALIGN_LEFT, NULL);
+		sprintf(magnitude, "%d", ent->pfx_steam_magnitude);
+		PMenu_UpdateEntry(p->entries + 13, magnitude, PMENU_ALIGN_LEFT, pfxEditPointEffect);
 	}
 	PMenu_Update(ent);
 }
@@ -151,6 +183,36 @@ void pfxSelectPointSettings(edict_t *ent, pmenuhnd_t *p)
 	updatePointEffectsMenu(ent, p);
 }
 
+pmenu_t point_fx_menu_03[] = 
+{
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ "*Select Point Effect",		PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ "Gekk Blood",					PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
+	{ "Green Blaster Impact",		PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
+	{ "Flechette Impact",			PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
+	{ "Heat Beam Sparks",			PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
+	{ "Heat Beam Steam",			PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
+	{ "Steam",						PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
+	{ "Chainfist Smoke",			PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
+	{ "More Blood Impact",			PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
+	{ "Electric Sparks",			PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
+	{ "Tracker Explosion (Unused)",	PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ "Next",						PMENU_ALIGN_LEFT,	pfxPointEffectsMenu02 },
+	{ "Previous",					PMENU_ALIGN_LEFT,	pfxPointEffectsMenu02 },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+};
+
+void pfxPointEffectsMenu03(edict_t *ent, pmenuhnd_t *p)
+{
+	ent->last_menu = PAGE_POINT_03;
+
+	PMenu_Close(ent);
+	PMenu_Open(ent, point_fx_menu_03, -1, sizeof(point_fx_menu_03) / sizeof(pmenu_t), NULL);
+}
+
 pmenu_t point_fx_menu_02[] = 
 {
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
@@ -168,8 +230,8 @@ pmenu_t point_fx_menu_02[] =
 	{ "Welding Sparks",				PMENU_ALIGN_LEFT,	pfxSelectPointSettings },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
-	{ "Next",						PMENU_ALIGN_LEFT,	pfxPointEffectsMenu02 },
-	{ "Previous",					PMENU_ALIGN_LEFT,	pfxResetToMainMenu },
+	{ "Next",						PMENU_ALIGN_LEFT,	pfxPointEffectsMenu03 },
+	{ "Previous",					PMENU_ALIGN_LEFT,	pfxPointEffectsMenu01 },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 };
 
@@ -313,7 +375,7 @@ pmenu_t entity_fx_menu_02[] =
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
-	{ "",							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 	{ "Previous",					PMENU_ALIGN_LEFT,	pfxEntityEffectsMenu01 },
@@ -350,7 +412,7 @@ pmenu_t entity_fx_menu_01[] =
 	{ "Teleporter Fountain",		PMENU_ALIGN_LEFT,	pfxSelectEntitySettings },
 	{ "Red Flag Particles",			PMENU_ALIGN_LEFT,	pfxSelectEntitySettings },
 	{ "Blue Flag Particles",		PMENU_ALIGN_LEFT,	pfxSelectEntitySettings },
-	{ "Quad Damage Trail",			PMENU_ALIGN_LEFT,	pfxSelectEntitySettings },
+	{ "Quad Damage Trail (Unused)",	PMENU_ALIGN_LEFT,	pfxSelectEntitySettings },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 	{ "Next",						PMENU_ALIGN_LEFT,	pfxEntityEffectsMenu02 },
@@ -413,6 +475,8 @@ void pfxMainMenu(edict_t* ent)
 		case PAGE_ENTITY_02:		PMenu_Open(ent, entity_fx_menu_02, -1, sizeof(entity_fx_menu_02) / sizeof(pmenu_t), NULL); break;
 		case PAGE_POINT_SETTINGS:	PMenu_Open(ent, point_fx_settings, -1, sizeof(entity_fx_settings) / sizeof(pmenu_t), NULL); pfxSelectPointSettings(ent, ent->client->menu); break;
 		case PAGE_POINT_01:			PMenu_Open(ent, point_fx_menu_01, -1, sizeof(point_fx_menu_01) / sizeof(pmenu_t), NULL); break;
+		case PAGE_POINT_02:			PMenu_Open(ent, point_fx_menu_02, -1, sizeof(point_fx_menu_02) / sizeof(pmenu_t), NULL); break;
+		case PAGE_POINT_03:			PMenu_Open(ent, point_fx_menu_03, -1, sizeof(point_fx_menu_03) / sizeof(pmenu_t), NULL); break;
 	}
 }
 
@@ -424,12 +488,12 @@ int getEntityEffect(int selected_fx)
 		case PFX_EF_BLASTER:		return EF_BLASTER;
 		case PFX_EF_GRENADE:		return EF_GRENADE;
 		case PFX_EF_ROCKET:			return EF_ROCKET;
-		case PFX_EF_BFG:			return EF_BFG;				// TODO: Work without anim fast.
+		case PFX_EF_BFG:			return EF_BFG;					// TODO: Work without anim fast.
 		case PFX_EF_FLIES:			return EF_FLIES;
 		case PFX_EF_TELEPORTER:		return EF_TELEPORTER;
 		case PFX_EF_FLAG1:			return EF_FLAG1;
 		case PFX_EF_FLAG2:			return EF_FLAG2;
-		case PFX_UNDEF_QUAD:		return EF_FLAG2|EF_TRACKER;	// TODO: edit client.
+		case PFX_UNDEF_QUAD:		return EF_FLAG2|EF_TRACKER;		// TODO: edit client.
 
 		case PFX_EF_IONRIPPER:		return EF_IONRIPPER;
 		case PFX_EF_GREENGIB:		return EF_GREENGIB;
@@ -457,12 +521,24 @@ int getPointEffect(int selected_fx)
 		case PFX_TE_SHIELD_SPARKS:		return TE_SHIELD_SPARKS;
 		case PFX_TE_SPLASH:				return TE_SPLASH;
 		case PFX_TE_LASER_SPARKS:		return TE_LASER_SPARKS;
+
 		case PFX_TE_EXPLOSION1:			return TE_EXPLOSION1;
 		case PFX_TE_BFG_BIGEXPLOSION:	return TE_BFG_BIGEXPLOSION;
 		case PFX_TE_TELEPORT:			return TE_TELEPORT_EFFECT;
 		case PFX_TE_BOSSTPORT:			return TE_BOSSTPORT;
 		case PFX_TE_TUNNEL_SPARKS:		return TE_TUNNEL_SPARKS;
 		case PFX_TE_WELDING_SPARKS:		return TE_WELDING_SPARKS;
+
+		case PFX_TE_GREENBLOOD:			return TE_GREENBLOOD;
+		case PFX_TE_BLASTER2:			return TE_BLASTER2;
+		case PFX_TE_FLECHETTE:			return TE_FLECHETTE;
+		case PFX_TE_HEATBEAM_SPARKS:	return TE_HEATBEAM_STEAM;	// These appear to be erroneously swapped in the client code.
+		case PFX_TE_HEATBEAM_STEAM:		return TE_HEATBEAM_SPARKS;
+		case PFX_TE_STEAM:				return TE_STEAM;
+		case PFX_TE_CHAINFIST_SMOKE:	return TE_CHAINFIST_SMOKE;
+		case PFX_TE_MOREBLOOD:			return TE_MOREBLOOD;
+		case PFX_TE_ELECTRIC_SPARKS:	return TE_ELECTRIC_SPARKS;
+		case PFX_TE_TRACKER_EXPLOSION:	return TE_TRACKER_EXPLOSION;
 
 		default:						return 0x00000000;
 	}
@@ -518,8 +594,14 @@ void pfxEmitterThink(edict_t* ent)
 	}
 	else if (selected_fx >= PFX_TE_BLOOD) // && <= PFX_???)
 	{
-		gi.WriteByte (svc_temp_entity);
+		gi.WriteByte(svc_temp_entity);
 		gi.WriteByte(getPointEffect(selected_fx));
+
+		// Steam stuff.
+		if (selected_fx == PFX_TE_STEAM)
+		{
+			gi.WriteShort(-1);
+		}
 
 		// Number of particles.
 		switch (selected_fx)
@@ -528,6 +610,7 @@ void pfxEmitterThink(edict_t* ent)
 			case PFX_TE_LASER_SPARKS:
 			case PFX_TE_TUNNEL_SPARKS:
 			case PFX_TE_WELDING_SPARKS:
+			case PFX_TE_STEAM:
 
 			gi.WriteByte(ent->owner->pfx_num);
 
@@ -538,7 +621,9 @@ void pfxEmitterThink(edict_t* ent)
 		if (selected_fx != PFX_TE_EXPLOSION1		&& 
 			selected_fx != PFX_TE_BFG_BIGEXPLOSION	&& 
 			selected_fx != PFX_TE_TELEPORT			&& 
-			selected_fx != PFX_TE_BOSSTPORT)
+			selected_fx != PFX_TE_BOSSTPORT			&&
+			selected_fx != PFX_TE_TRACKER_EXPLOSION	&&
+			selected_fx != PFX_TE_CHAINFIST_SMOKE)
 		{
 			gi.WriteDir(dir);
 		}
@@ -548,16 +633,24 @@ void pfxEmitterThink(edict_t* ent)
 		{
 			gi.WriteByte(ent->owner->pfx_splash_index);
 		}
+
 		// Colour.
 		switch (selected_fx)
 		{
 			case PFX_TE_LASER_SPARKS:
 			case PFX_TE_TUNNEL_SPARKS:
 			case PFX_TE_WELDING_SPARKS:
+			case PFX_TE_STEAM:
 
 			gi.WriteByte(ent->owner->pfx_colour);
 
 			break;
+		}
+
+		// Steam magnitude.
+		if (selected_fx == PFX_TE_STEAM)
+		{
+			gi.WriteShort(ent->owner->pfx_steam_magnitude);
 		}
 		gi.multicast(ent->s.origin, MULTICAST_PVS);
 	}
