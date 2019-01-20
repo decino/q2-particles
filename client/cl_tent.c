@@ -51,6 +51,7 @@ typedef struct
 	int		dest_entity;
 	struct model_s	*model;
 	int		endtime;
+	int		type;
 	vec3_t	offset;
 	vec3_t	start, end;
 } beam_t;
@@ -413,14 +414,17 @@ int CL_ParsePlayerBeam (struct model_s *model)
 	vec3_t	start, end, offset;
 	beam_t	*b;
 	int		i;
+	int		type;
 	
 	ent = MSG_ReadShort (&net_message);
 	
 	MSG_ReadPos (&net_message, start);
 	MSG_ReadPos (&net_message, end);
+
 	// PMM - network optimization
 	if (model == cl_mod_heatbeam)
 	{
+		type = MSG_ReadByte (&net_message);
 		VectorSet(offset, 0, 0, 0);
 	}
 	else if (model == cl_mod_monster_heatbeam)
@@ -442,6 +446,7 @@ int CL_ParsePlayerBeam (struct model_s *model)
 			b->entity = ent;
 			b->model = model;
 			b->endtime = cl.time + 200;
+			b->type = type;
 			VectorCopy (start, b->start);
 			VectorCopy (end, b->end);
 			VectorCopy (offset, b->offset);
@@ -457,6 +462,7 @@ int CL_ParsePlayerBeam (struct model_s *model)
 			b->entity = ent;
 			b->model = model;
 			b->endtime = cl.time + 100;		// PMM - this needs to be 100 to prevent multiple heatbeams
+			b->type = type;
 			VectorCopy (start, b->start);
 			VectorCopy (end, b->end);
 			VectorCopy (offset, b->offset);
@@ -1567,10 +1573,19 @@ void CL_AddPlayerBeams (void)
 		// if it's the heatbeam, draw the particle effect
 		if ((cl_mod_heatbeam && (b->model == cl_mod_heatbeam) /* && (b->entity == cl.playernum+1) */ ))
 		{
-			CL_Heatbeam (b->start, dist);
+			switch (b->type)
+			{
+			case 0: CL_HeatbeamRings(b->start, dist);				break;
+			case 1: CL_HeatbeamCorkscrew(b->start, b->end, false);	break;
+			case 2: CL_HeatbeamCorkscrew(b->start, b->end, true);	break;
+			case 3: CL_HeatbeamSpray(b->start, b->end);				break;
+
+			default: break;
+			}
 		}
 
 	// add new entities for the beams
+		/*
 		d = VectorNormalize(dist);
 
 		memset (&ent, 0, sizeof(ent));
@@ -1644,7 +1659,7 @@ void CL_AddPlayerBeams (void)
 			for (j=0 ; j<3 ; j++)
 				org[j] += dist[j]*len;
 			d -= model_length;
-		}
+		}*/
 	}
 }
 

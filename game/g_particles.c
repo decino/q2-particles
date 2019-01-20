@@ -15,6 +15,10 @@ void pfxEditLineEffect(edict_t *ent, pmenuhnd_t *p)
 		{
 			ent->pfx_colour = (ent->pfx_colour + 1) % 256;
 		}
+		if (ent->pfx_selected_fx == PFX_TE_HEATBEAM)
+		{
+			ent->pfx_heat_type = (ent->pfx_heat_type + 1) % 4;
+		}
 	}
 	updateLineEffectsMenu(ent, p);
 }
@@ -45,6 +49,7 @@ void updateLineEffectsMenu(edict_t *ent, pmenuhnd_t *p)
 {
 	static char frequency[8];
 	static char colour[4];
+	static char beam_type[4];
 
 	sprintf(frequency, "%d", ent->pfx_frequency);
 	PMenu_UpdateEntry(p->entries + 4, frequency, PMENU_ALIGN_LEFT, pfxEditLineEffect);
@@ -59,6 +64,15 @@ void updateLineEffectsMenu(edict_t *ent, pmenuhnd_t *p)
 		PMenu_UpdateEntry(p->entries + 7, colour, PMENU_ALIGN_LEFT, pfxEditLineEffect);
 
 		break;
+	}
+
+	// Heat beam type.
+		// Colour.
+	if (ent->pfx_selected_fx == PFX_TE_HEATBEAM)
+	{
+		PMenu_UpdateEntry(p->entries + 6, "*Beam Type", PMENU_ALIGN_LEFT, NULL);
+		sprintf(beam_type, "%d", ent->pfx_heat_type);
+		PMenu_UpdateEntry(p->entries + 7, beam_type, PMENU_ALIGN_LEFT, pfxEditLineEffect);
 	}
 	PMenu_Update(ent);
 }
@@ -852,6 +866,12 @@ void pfxEmitterThink(edict_t* ent)
 		gi.WritePosition(start);
 		gi.WritePosition(trace.endpos);
 
+		// Heat beam type.
+		if (selected_fx == PFX_TE_HEATBEAM)
+		{
+			gi.WriteByte(ent->owner->pfx_heat_type);
+		}
+
 		// Colour.
 		switch (selected_fx)
 		{
@@ -904,6 +924,6 @@ void pfxSpawnEmitter(edict_t *ent, vec3_t g_offset)
 
 	gi.WriteByte(svc_muzzleflash);
 	gi.WriteShort(ent - g_edicts);
-	gi.WriteByte(MZ2_MEDIC_BLASTER_1);
+	gi.WriteByte(MZ_HYPERBLASTER);
 	gi.multicast(ent->s.origin, MULTICAST_PVS);
 }

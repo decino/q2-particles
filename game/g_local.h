@@ -1143,6 +1143,7 @@ struct edict_s
 	int			pfx_splash_index;
 	int			pfx_colour;
 	int			pfx_steam_magnitude;
+	int			pfx_heat_type;
 
 	// Menu stuff.
 	int			last_menu;

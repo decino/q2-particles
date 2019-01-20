@@ -520,9 +520,8 @@ void CL_Heatbeam (vec3_t start, vec3_t end)
 	}
 }
 #endif
-#ifdef RINGS
-//void CL_Heatbeam (vec3_t start, vec3_t end)
-void CL_Heatbeam (vec3_t start, vec3_t forward)
+
+void CL_HeatbeamRings(vec3_t start, vec3_t forward)
 {
 	vec3_t		move;
 	vec3_t		vec;
@@ -583,10 +582,6 @@ void CL_Heatbeam (vec3_t start, vec3_t forward)
 			
 			p->time = cl.time;
 			VectorClear (p->accel);
-//			rot+= fmod(ltime, 12.0)*M_PI;
-//			c = cos(rot)/2.0;
-//			s = sin(rot)/2.0;
-//			variance = 0.4 + ((float)rand()/(float)RAND_MAX) *0.2;
 			variance = 0.5;
 			c = cos(rot)*variance;
 			s = sin(rot)*variance;
@@ -618,9 +613,95 @@ void CL_Heatbeam (vec3_t start, vec3_t forward)
 		VectorAdd (move, vec, move);
 	}
 }
-#endif
-#ifdef SPRAY
-void CL_Heatbeam (vec3_t start, vec3_t end)
+
+void CL_HeatbeamCorkscrew(vec3_t start, vec3_t end, qboolean is_double)
+{
+	vec3_t		move;
+	vec3_t		vec;
+	float		len;
+	int			j,k;
+	cparticle_t	*p;
+	vec3_t		right, up;
+	int			i;
+	float		d, c, s;
+	vec3_t		dir;
+	float		ltime;
+	float		step = 5.0;
+
+	VectorCopy (start, move);
+	VectorSubtract (end, start, vec);
+	len = VectorNormalize (vec);
+
+//	MakeNormalVectors (vec, right, up);
+	VectorCopy (cl.v_right, right);
+	VectorCopy (cl.v_up, up);
+	VectorMA (move, -1, right, move);
+	VectorMA (move, -1, up, move);
+
+	VectorScale (vec, step, vec);
+	ltime = (float) cl.time/1000.0;
+
+//	for (i=0 ; i<len ; i++)
+	for (i=0 ; i<len ; i+=step)
+	{
+		int k = 1;
+		int k_max = 2;
+
+		d = i * 0.1 - fmod(ltime,16.0)*M_PI;
+		c = cos(d)/1.75;
+		s = sin(d)/1.75;
+
+		if (is_double)
+		{
+			k = -1;
+			k_max = 2;
+		}	
+		for (k = k; k < k_max; k += 2)
+		{
+			if (!free_particles)
+				return;
+
+			p = free_particles;
+			free_particles = p->next;
+			p->next = active_particles;
+			active_particles = p;
+			
+			p->time = cl.time;
+			VectorClear (p->accel);
+
+			p->alpha = 0.5;
+	//		p->alphavel = -1.0 / (1+frand()*0.2);
+			// only last one frame!
+			p->alphavel = INSTANT_PARTICLE;
+	//		p->color = 0x74 + (rand()&7);
+//			p->color = 223 - (rand()&7);
+			p->color = 223;
+//			p->color = 240;
+
+			// trim it so it looks like it's starting at the origin
+			if (i < 10)
+			{
+				VectorScale (right, c*(i/10.0)*k, dir);
+				VectorMA (dir, s*(i/10.0)*k, up, dir);
+			}
+			else
+			{
+				VectorScale (right, c*k, dir);
+				VectorMA (dir, s*k, up, dir);
+			}
+			
+			for (j=0 ; j<3 ; j++)
+			{
+				p->org[j] = move[j] + dir[j]*3;
+	//			p->vel[j] = dir[j]*6;
+				p->vel[j] = 0;
+			}
+		}
+		VectorAdd (move, vec, move);
+	}
+}
+
+void CL_HeatbeamSpray(vec3_t start, vec3_t end)
 {
 	vec3_t		move;
 	vec3_t		vec;
@@ -676,68 +757,7 @@ void CL_Heatbeam (vec3_t start, vec3_t end)
 		VectorMA (p->vel, c, right, p->vel);
 		VectorMA (p->vel, s, up, p->vel);
 	}
-/*
-
-	ltime = (float) cl.time/1000.0;
-	start_pt = fmod(ltime*16.0,step);
-	VectorMA (move, start_pt, vec, move);
-
-	VectorScale (vec, step, vec);
-
-//	Com_Printf ("%f\n", ltime);
-	rstep = M_PI/12.0;
-	for (i=start_pt ; i<len ; i+=step)
-	{
-		if (i>step*5) // don't bother after the 5th ring
-			break;
-
-		for (rot = 0; rot < M_PI*2; rot += rstep)
-		{
-			if (!free_particles)
-				return;
-
-			p = free_particles;
-			free_particles = p->next;
-			p->next = active_particles;
-			active_particles = p;
-			
-			p->time = cl.time;
-			VectorClear (p->accel);
-//			rot+= fmod(ltime, 12.0)*M_PI;
-//			c = cos(rot)/2.0;
-//			s = sin(rot)/2.0;
-			c = cos(rot)/1.5;
-			s = sin(rot)/1.5;
-			
-			// trim it so it looks like it's starting at the origin
-			if (i < 10)
-			{
-				VectorScale (right, c*(i/10.0), dir);
-				VectorMA (dir, s*(i/10.0), up, dir);
-			}
-			else
-			{
-				VectorScale (right, c, dir);
-				VectorMA (dir, s, up, dir);
-			}
-		
-			p->alpha = 0.5;
-	//		p->alphavel = -1.0 / (1+frand()*0.2);
-			p->alphavel = -1000.0;
-	//		p->color = 0x74 + (rand()&7);
-			p->color = 223 - (rand()&7);
-			for (j=0 ; j<3 ; j++)
-			{
-				p->org[j] = move[j] + dir[j]*3;
-	//			p->vel[j] = dir[j]*6;
-				p->vel[j] = 0;
-			}
-		}
-		VectorAdd (move, vec, move);
-	}
-*/
 }
-#endif
 
 /*
 ===============
