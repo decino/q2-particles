@@ -1,3 +1,5 @@
+#define	PFX_VERSION					"1.0"
+
 #define PFX_EF_GIB					3
 #define PFX_EF_BLASTER				4
 #define	PFX_EF_GRENADE				5
@@ -70,6 +72,7 @@
 #define PAGE_ENTITY_SETTINGS	0x000C
 #define PAGE_POINT_SETTINGS		0x000D
 #define PAGE_LINE_SETTINGS		0x000E
+#define	PAGE_GENERIC_SETTINGS	0x000B
 
 #define	PAGE_ENTITY_01			0x0000
 #define	PAGE_ENTITY_02			0x0001
@@ -83,10 +86,13 @@ void updateLineEffectsMenu(edict_t *ent, pmenuhnd_t *p);
 void pfxLineEffectsMenu01(edict_t *ent, pmenuhnd_t *p);
 
 void updatePointEffectsMenu(edict_t *ent, pmenuhnd_t *p);
+void updateGenericEffectsMenu(edict_t *ent, pmenuhnd_t *p);
 void pfxPointEffectsMenu04(edict_t *ent, pmenuhnd_t *p);
 void pfxPointEffectsMenu03(edict_t *ent, pmenuhnd_t *p);
 void pfxPointEffectsMenu02(edict_t *ent, pmenuhnd_t *p);
 void pfxPointEffectsMenu01(edict_t *ent, pmenuhnd_t *p);
+void pfxSelectPointSettings(edict_t *ent, pmenuhnd_t *p);
+void pfxSelectGenericSettings(edict_t *ent, pmenuhnd_t *p);
 
 void updateEntityEffectsMenu(edict_t *ent, pmenuhnd_t *p);
 void pfxEditEntityEffect(edict_t *ent, pmenuhnd_t *p);

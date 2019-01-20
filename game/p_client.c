@@ -1276,6 +1276,8 @@ void PutClientInServer (edict_t *ent)
 	ent->pfx_colour = 0xF0;
 	ent->pfx_steam_magnitude = 64;
 	ent->pfx_heat_type = 0;
+	ent->pfx_colour_num = 1;
+	ent->pfx_alphavel = 512;
 
 	ent->last_menu = PAGE_MAIN;
 	ent->prev_menu = PAGE_MAIN;

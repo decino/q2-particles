@@ -117,6 +117,19 @@ pmenu_t line_fx_menu_01[] =
 // =============================================================================================================================
 // Point Particle Effects
 // =============================================================================================================================
+void pfxEditGenericEffect(edict_t *ent, pmenuhnd_t *p)
+{
+	if (p->cur == 4)
+	{
+		ent->pfx_colour_num = 1 + ent->pfx_colour_num % 256;
+	}
+	if (p->cur == 7)
+	{
+		ent->pfx_alphavel = (ent->pfx_alphavel << 1) % SHRT_MAX;
+	}
+	updateGenericEffectsMenu(ent, p);
+}
+
 void pfxEditPointEffect(edict_t *ent, pmenuhnd_t *p)
 {
 	if (p->cur == 4)
@@ -133,6 +146,7 @@ void pfxEditPointEffect(edict_t *ent, pmenuhnd_t *p)
 			case PFX_TE_WELDING_SPARKS:
 			case PFX_TE_TUNNEL_SPARKS:
 			case PFX_TE_STEAM:
+			case PFX_UNDEF_GENERIC:
 
 			ent->pfx_num = (ent->pfx_num << 1);
 
@@ -162,6 +176,7 @@ void pfxEditPointEffect(edict_t *ent, pmenuhnd_t *p)
 			case PFX_TE_WELDING_SPARKS:
 			case PFX_TE_TUNNEL_SPARKS:
 			case PFX_TE_STEAM:
+			case PFX_UNDEF_GENERIC:
 
 			ent->pfx_colour = (ent->pfx_colour + 1) % 256;
 
@@ -171,7 +186,7 @@ void pfxEditPointEffect(edict_t *ent, pmenuhnd_t *p)
 	if (p->cur == 13)
 	{
 		// Steam magnitude.
-		if (ent->pfx_selected_fx == PFX_TE_STEAM)
+		if (ent->pfx_selected_fx == PFX_TE_STEAM || ent->pfx_selected_fx == PFX_UNDEF_GENERIC)
 		{
 			ent->pfx_steam_magnitude = (ent->pfx_steam_magnitude << 1);
 
@@ -204,10 +219,60 @@ void pfxPointEffectsMenu(edict_t *ent, pmenuhnd_t *p)
 	}
 }
 
+pmenu_t gen_point_fx_settings[] = 
+{
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ "*Point Effect Settings",		PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ "*Number of Colours",			PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ "*Particle Duration",			PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ "Previous",					PMENU_ALIGN_LEFT,	pfxPointEffectsMenu },
+	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+};
+
+void updateGenericEffectsMenu(edict_t *ent, pmenuhnd_t *p)
+{
+	static char num[4];
+	static char duration[8];
+
+	sprintf(num, "%d", ent->pfx_colour_num);
+	PMenu_UpdateEntry(p->entries + 4, num, PMENU_ALIGN_LEFT, pfxEditGenericEffect);
+
+	sprintf(duration, "%d", ent->pfx_alphavel);
+	PMenu_UpdateEntry(p->entries + 7, duration, PMENU_ALIGN_LEFT, pfxEditGenericEffect);
+
+	PMenu_Update(ent);
+}
+
+void pfxSelectGenericSettings(edict_t *ent, pmenuhnd_t *p)
+{
+	if (ent->last_menu != PAGE_GENERIC_SETTINGS)
+	{
+		ent->prev_menu = ent->last_menu;
+	}
+	ent->last_menu = PAGE_GENERIC_SETTINGS;
+
+	PMenu_Close(ent);
+	PMenu_Open(ent, gen_point_fx_settings, -1, sizeof(gen_point_fx_settings) / sizeof(pmenu_t), NULL);
+
+	updateGenericEffectsMenu(ent, p);
+}
+
 pmenu_t point_fx_settings[] = 
 {
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
-	{ "*Entity Effect Settings",	PMENU_ALIGN_LEFT,	NULL },
+	{ "*Point Effect Settings",		PMENU_ALIGN_LEFT,	NULL },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
 	{ "*Frequency (Hz)",			PMENU_ALIGN_LEFT,	NULL },
 	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
@@ -245,6 +310,7 @@ void updatePointEffectsMenu(edict_t *ent, pmenuhnd_t *p)
 		case PFX_TE_TUNNEL_SPARKS:
 		case PFX_TE_WELDING_SPARKS:
 		case PFX_TE_STEAM:
+		case PFX_UNDEF_GENERIC:
 		
 		PMenu_UpdateEntry(p->entries + 6, "*Number of Particles", PMENU_ALIGN_LEFT, NULL);
 		sprintf(num, "%d", ent->pfx_num);
@@ -268,6 +334,7 @@ void updatePointEffectsMenu(edict_t *ent, pmenuhnd_t *p)
 		case PFX_TE_TUNNEL_SPARKS:
 		case PFX_TE_WELDING_SPARKS:
 		case PFX_TE_STEAM:
+		case PFX_UNDEF_GENERIC:
 
 		PMenu_UpdateEntry(p->entries + 9, "*Colour", PMENU_ALIGN_LEFT, NULL);
 		sprintf(colour, "%d", ent->pfx_colour);
@@ -277,11 +344,17 @@ void updatePointEffectsMenu(edict_t *ent, pmenuhnd_t *p)
 	}
 
 	// Steam magnitude.
-	if (ent->pfx_selected_fx == PFX_TE_STEAM)
+	if (ent->pfx_selected_fx == PFX_TE_STEAM || ent->pfx_selected_fx == PFX_UNDEF_GENERIC)
 	{
-		PMenu_UpdateEntry(p->entries + 12, "*Magnitude", PMENU_ALIGN_LEFT, NULL);
+		PMenu_UpdateEntry(p->entries + 12, "*Spread", PMENU_ALIGN_LEFT, NULL);
 		sprintf(magnitude, "%d", ent->pfx_steam_magnitude);
 		PMenu_UpdateEntry(p->entries + 13, magnitude, PMENU_ALIGN_LEFT, pfxEditPointEffect);
+	}
+
+	// Generic particle extra menu.
+	if (ent->pfx_selected_fx == PFX_UNDEF_GENERIC)
+	{
+		PMenu_UpdateEntry(p->entries + 15, "Next", PMENU_ALIGN_LEFT, pfxSelectGenericSettings);
 	}
 	PMenu_Update(ent);
 }
@@ -594,24 +667,24 @@ void pfxLineEffectsMenu01(edict_t *ent, pmenuhnd_t *p)
 
 pmenu_t main_menu[] = 
 {
-	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
-	{ "*Quake II",					PMENU_ALIGN_LEFT,	NULL },
-	{ "*Particle Effect Tester",	PMENU_ALIGN_LEFT,	NULL },
-	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
-	{ "Use [ and ] to move",		PMENU_ALIGN_LEFT,	NULL },
-	{ "the cursor.",				PMENU_ALIGN_LEFT,	NULL },
-	{ "Press enter to select.",		PMENU_ALIGN_LEFT,	NULL },
-	{ "Use tab to open or",			PMENU_ALIGN_LEFT,	NULL },
-	{ "close menu.",				PMENU_ALIGN_LEFT,	NULL },
-	{ "Shoot gun to spawn a",		PMENU_ALIGN_LEFT,	NULL },
-	{ "particle emitter.",			PMENU_ALIGN_LEFT,	NULL },
-	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
-	{ "Entity Effects",				PMENU_ALIGN_LEFT,	pfxEntityEffectsMenu01 },
-	{ "Point Effects",				PMENU_ALIGN_LEFT,	pfxPointEffectsMenu01 },
-	{ "Line Effects",				PMENU_ALIGN_LEFT,	pfxLineEffectsMenu01 },
-	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
-	{ "*www.youtube.com/c/decino",	PMENU_ALIGN_LEFT,	NULL },
-	{ NULL,							PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,								PMENU_ALIGN_LEFT,	NULL },
+	{ "*Particle Effect Tester",		PMENU_ALIGN_LEFT,	NULL },
+	{ "*v" PFX_VERSION,					PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,								PMENU_ALIGN_LEFT,	NULL },
+	{ "Use [ and ] to move",			PMENU_ALIGN_LEFT,	NULL },
+	{ "the cursor.",					PMENU_ALIGN_LEFT,	NULL },
+	{ "Press enter to select.",			PMENU_ALIGN_LEFT,	NULL },
+	{ "Use tab to open or",				PMENU_ALIGN_LEFT,	NULL },
+	{ "close menu.",					PMENU_ALIGN_LEFT,	NULL },
+	{ "Shoot gun to spawn a",			PMENU_ALIGN_LEFT,	NULL },
+	{ "particle emitter.",				PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,								PMENU_ALIGN_LEFT,	NULL },
+	{ "Entity Effects",					PMENU_ALIGN_LEFT,	pfxEntityEffectsMenu01 },
+	{ "Point Effects",					PMENU_ALIGN_LEFT,	pfxPointEffectsMenu01 },
+	{ "Line Effects",					PMENU_ALIGN_LEFT,	pfxLineEffectsMenu01 },
+	{ NULL,								PMENU_ALIGN_LEFT,	NULL },
+	{ "*www.youtube.com/c/decino",		PMENU_ALIGN_LEFT,	NULL },
+	{ NULL,								PMENU_ALIGN_LEFT,	NULL },
 };
 
 void pfxMainMenu(edict_t* ent)
@@ -624,6 +697,7 @@ void pfxMainMenu(edict_t* ent)
 		case PAGE_ENTITY_SETTINGS:	PMenu_Open(ent, entity_fx_settings, -1, sizeof(entity_fx_settings) / sizeof(pmenu_t), NULL); pfxSelectEntitySettings(ent, ent->client->menu); break;
 		case PAGE_ENTITY_01:		PMenu_Open(ent, entity_fx_menu_01, -1, sizeof(entity_fx_menu_01) / sizeof(pmenu_t), NULL); break;
 		case PAGE_ENTITY_02:		PMenu_Open(ent, entity_fx_menu_02, -1, sizeof(entity_fx_menu_02) / sizeof(pmenu_t), NULL); break;
+		case PAGE_GENERIC_SETTINGS:	PMenu_Open(ent, gen_point_fx_settings, -1, sizeof(gen_point_fx_settings) / sizeof(pmenu_t), NULL); pfxSelectGenericSettings(ent, ent->client->menu); break;
 		case PAGE_POINT_SETTINGS:	PMenu_Open(ent, point_fx_settings, -1, sizeof(entity_fx_settings) / sizeof(pmenu_t), NULL); pfxSelectPointSettings(ent, ent->client->menu); break;
 		case PAGE_POINT_01:			PMenu_Open(ent, point_fx_menu_01, -1, sizeof(point_fx_menu_01) / sizeof(pmenu_t), NULL); break;
 		case PAGE_POINT_02:			PMenu_Open(ent, point_fx_menu_02, -1, sizeof(point_fx_menu_02) / sizeof(pmenu_t), NULL); break;
@@ -699,10 +773,10 @@ int getPointEffect(int selected_fx)
 		case PFX_UNDEF_TRACKER:			return TE_EXPLOSION1_BIG;
 		case PFX_TE_WIDOWBEAMOUT:		return TE_WIDOWBEAMOUT;
 		case PFX_TE_WIDOWSPLASH:		return TE_WIDOWSPLASH;
-		case PFX_TE_MONSTER_HEATBEAM:	return TE_MONSTER_HEATBEAM;	// TODO: Edit client.
+		case PFX_TE_MONSTER_HEATBEAM:	return TE_MONSTER_HEATBEAM;
 		case PFX_TE_NUKEBLAST:			return TE_NUKEBLAST;
-		case PFX_TE_FLAME:				return TE_FLAME;			// TODO: Edit client.
-		case PFX_UNDEF_GENERIC:			return TE_PLASMA_EXPLOSION;	// TODO: Edit client.
+		case PFX_TE_FLAME:				return TE_FLAME;			
+		case PFX_UNDEF_GENERIC:			return TE_PLASMA_EXPLOSION;
 
 		default:						return 0x00000000;
 	}
@@ -790,6 +864,7 @@ void pfxEmitterThink(edict_t* ent)
 			case PFX_TE_TUNNEL_SPARKS:
 			case PFX_TE_WELDING_SPARKS:
 			case PFX_TE_STEAM:
+			case PFX_UNDEF_GENERIC:
 
 			gi.WriteByte(ent->owner->pfx_num);
 
@@ -826,6 +901,7 @@ void pfxEmitterThink(edict_t* ent)
 			case PFX_TE_TUNNEL_SPARKS:
 			case PFX_TE_WELDING_SPARKS:
 			case PFX_TE_STEAM:
+			case PFX_UNDEF_GENERIC:
 
 			gi.WriteByte(ent->owner->pfx_colour);
 
@@ -833,9 +909,16 @@ void pfxEmitterThink(edict_t* ent)
 		}
 
 		// Steam magnitude.
-		if (selected_fx == PFX_TE_STEAM)
+		if (selected_fx == PFX_TE_STEAM || selected_fx == PFX_UNDEF_GENERIC)
 		{
 			gi.WriteShort(ent->owner->pfx_steam_magnitude);
+		}
+
+		// Generic particle number of colours.
+		if (selected_fx == PFX_UNDEF_GENERIC)
+		{
+			gi.WriteByte(ent->owner->pfx_colour_num);
+			gi.WriteFloat((float)ent->owner->pfx_alphavel / 100.0f);
 		}
 		gi.multicast(ent->s.origin, MULTICAST_PVS);
 	}

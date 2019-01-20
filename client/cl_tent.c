@@ -708,6 +708,7 @@ void CL_ParseTEnt (void)
 	int		r;
 	int		ent;
 	int		magnitude;
+	float	alphavel;
 
 	type = MSG_ReadByte (&net_message);
 
@@ -864,7 +865,9 @@ void CL_ParseTEnt (void)
 		break;
 
 	// RAFAEL
+		/*
 	case TE_PLASMA_EXPLOSION:
+		
 		MSG_ReadPos (&net_message, pos);
 		ex = CL_AllocExplosion ();
 		VectorCopy (pos, ex->ent.origin);
@@ -882,7 +885,7 @@ void CL_ParseTEnt (void)
 		ex->frames = 15;
 		CL_ExplosionParticles (pos);
 		S_StartSound (pos, 0, 0, cl_sfx_rockexp, 1, ATTN_NORM, 0);
-		break;
+		break;*/
 	
 	case TE_EXPLOSION1:
 	/*
@@ -1225,6 +1228,21 @@ void CL_ParseTEnt (void)
 //		CL_ColorExplosionParticles (pos, 0, 1);
 		CL_Tracker_Explode (pos);
 		S_StartSound (pos, 0, 0, cl_sfx_disrexp, 1, ATTN_NORM, 0);
+		break;
+
+	// Generic particle effect hack.
+	case TE_PLASMA_EXPLOSION:
+
+		cnt = MSG_ReadByte(&net_message);
+		MSG_ReadPos(&net_message, pos);
+		MSG_ReadDir(&net_message, dir);
+		color = MSG_ReadByte(&net_message);
+		magnitude = MSG_ReadShort(&net_message);
+		r = MSG_ReadByte(&net_message);
+		alphavel = MSG_ReadFloat(&net_message);
+
+		CL_GenericParticleEffect(pos, dir, color, cnt, r, magnitude, alphavel);
+
 		break;
 
 	// Flame restoration.
